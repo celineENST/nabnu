@@ -1,0 +1,63 @@
+/*** GENERAL ***/
+
+html * {
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+	-webkit-text-size-adjust: 100%; /*Prevent text size change on orientation change.*/
+
+}
+html, body {
+	height: 100vh;
+	width: 100vw;
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	font-family: 'Work Sans', sans-serif !important;
+	font-weight: 400;
+}
+
+/*** USEFUL CLASSES ***/
+.center-content {
+	text-align: center !important;
+}
+.quicksand {
+	font-family: 'Quicksand', sans-serif !important;
+	font-weight: 700 !important;
+}
+.margin-bottom {
+	margin-bottom: 1vh !important;
+}
+.row-hv-centered {
+	height: 50vh !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+/*** TITLES ***/
+
+h1,h2,h3,h4,h5 {
+	font-family: 'Work Sans', sans-serif !important;
+}
+
+h2 {
+	font-weight: 700 !important;
+	font-size: 10vh !important;
+}
+
+/*** HEADER ***/
+#header {
+}
+/*** UPLOAD FORM ***/
+#upload-form {
+	height: 50vh !important;
+	flex-direction: column;
+}
+/*** CURRENT UPLOAD ***/
+#current-upload {
+	height: 50vh !important;
+
+}

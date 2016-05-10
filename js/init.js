@@ -13,7 +13,7 @@ var app = new Vue({
 		uploadPhoto: function() {
 			var self = this;
 			self.message= "uploading";
-			var file = $("#snapPola")[0].files[0];
+			var file = $("#inputPhoto")[0].files[0];
 			var fileType = /image.*/;
 			if (file.type.match(fileType)) {
 				var reader = new FileReader();
