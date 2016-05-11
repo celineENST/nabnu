@@ -37,7 +37,7 @@
 				<h2>Poloveroid</h2>
 			</div>
 		</div>
-		<div class="row row-hv-centered" id="sign-up" v-if="logged==false">
+		<div class="row row-hv-centered" id="sign-up" v-if="logged!=true">
 			<div class="col-md-4 col-xs-12 col-lg-4 center-content">
 				<h3>{{ authentication }}</h3>
 				<div class="input-group margin-bottom">
@@ -58,7 +58,7 @@
 
 		<div class="row row-hv-centered" id="upload-form" v-if="logged==true">
 			<div class="center-content margin-bottom">
-				<input type="file" accept="image/*;capture=camera" id="inputPhoto" class="form-control">
+				<input type="file" accept="image/*" capture="camera" id="inputPhoto" class="form-control">
 			</div>
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="uploadPhoto()">

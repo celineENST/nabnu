@@ -20,31 +20,34 @@ var app = new Vue({
 		userPrompt: "Already a User?",
 		email: "",
 		pwd: "",
-		usr: "",
 		// Upload data
 		upload: "please upload a file",
 		url: ""
 	},
 	methods: {
-		// Authentication Methods
+		// Create User
+		createUser: function() {
+			var self = this;
+			ref.createUser({
+				email    : self.email,
+				password : self.pwd
+			}, function(error, userData) {
+				if (error) {
+					console.log("Error creating user:", error);
+					alert("Couldn't create user!");
+					return;
+				} else {
+					console.log("Successfully created user account with uid:", userData.uid);
+				}
+			});
+		},
+		// Sign user if needed and then log user in 
 		loginSignup: function() {
 			var self = this;
 			// We check if we need to create a new account first
 			if (self.authentication == "Sign Up") {
-				// Create the user
-				ref.createUser({
-					email    : self.email,
-					password : self.pwd
-				}, function(error, userData) {
-					if (error) {
-						console.log("Error creating user:", error);
-						alert("Couldn't create user!");
-						return;
-					} else {
-						console.log("Successfully created user account with uid:", userData.uid);
-					}
-				});
-			} 
+				self.createUser();
+			}; 
 			// If not, we just log them in
 			ref.authWithPassword({
 				email    : self.email,
@@ -53,15 +56,10 @@ var app = new Vue({
 				if (error) {
 					console.log("Login Failed!", error);
 				} else {
-					// Keeping the usr uid in memory
-					self.usr = authData.uid;
 					// Resetting the fields
 					self.email ="";
 					self.pwd ="";
-					// Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
-					self.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + authData.uid).limitToLast(5));
-					// We are logged in, so display all the app for logged in user
-					self.logged=true;
+					fetchUserFeed(authData.uid);
 				}
 			});
 		},
@@ -79,7 +77,7 @@ var app = new Vue({
 					break;
 			}
 		},
-		// Upload Methods
+		// Upload Photo
 		uploadPhoto: function() {
 			var self = this;
 			self.upload= "uploading";
@@ -109,3 +107,21 @@ var app = new Vue({
 		}
 	}
 });
+
+// Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
+function fetchUserFeed(usrUid) {
+	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + usrUid).limitToFirst(5));
+}
+
+// Callback checking if we have authentified. Authentication persists 24H by default
+function authDataCallback(authData) {
+	if (authData) {
+		fetchUserFeed(authData.uid);
+		app.logged = true;
+		console.log("User " + authData.uid + " is logged in with " + authData.provider);
+	} else {
+		app.logged = false;
+		console.log("User is logged out");
+	}
+}
+ref.onAuth(authDataCallback);
