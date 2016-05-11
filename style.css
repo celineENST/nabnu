@@ -48,16 +48,32 @@ h2 {
 	font-size: 10vh !important;
 }
 
+h3, h4 {
+	font-weight: 700 !important;
+}
+
 /*** HEADER ***/
 #header {
+	background-color: #FFFFFF;
+	color: #B395C8;
 }
-/*** UPLOAD FORM ***/
+/*** UPLOAD ROWS ***/
 #upload-form {
-	height: 50vh !important;
+	background-color: #501D50;
 	flex-direction: column;
 }
-/*** CURRENT UPLOAD ***/
 #current-upload {
-	height: 50vh !important;
-
+	min-height: 50vh !important;
+	max-height: 100vh !important;
+	height: auto !important;
+}
+#last-uploads {
+	min-height: 50vh !important;
+	max-height: 100vh !important;
+	height: auto !important;
+	background-color: #B395C8;
+}
+/*** AUTHENTICATION ROW ***/
+#sign-up {
+	background-color: #EEEEEE;
 }

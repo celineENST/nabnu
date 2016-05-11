@@ -37,7 +37,26 @@
 				<h2>Poloveroid</h2>
 			</div>
 		</div>
-		<div class="row row-hv-centered" id="upload-form">
+		<div class="row row-hv-centered" id="sign-up" v-if="logged==false">
+			<div class="col-md-4 col-xs-12 col-lg-4 center-content">
+				<h3>{{ authentication }}</h3>
+				<div class="input-group margin-bottom">
+						<span class="input-group-addon" id="basic-addon1">@</span>
+						<input type="text" class="form-control" placeholder="Email" v-model="email">
+				</div>
+				<div class="margin-bottom">
+					<input type="password" class="form-control" placeholder="Password" v-model="pwd">
+				</div>
+				<button type="button" class="btn btn-default quicksand" @click="loginSignup()">
+					{{ authentication }}
+				</button>
+				<button type="button" class="btn btn-warning quicksand" @click="toggleUser()">
+					{{ userPrompt }}
+				</button>
+			</div>
+		</div>
+
+		<div class="row row-hv-centered" id="upload-form" v-if="logged==true">
 			<div class="center-content margin-bottom">
 				<input type="file" accept="image/*;capture=camera" id="inputPhoto" class="form-control">
 			</div>
@@ -48,20 +67,14 @@
 			</div>
 		</div>
 
-		<div class="row row-hv-centered" id="current-upload">
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				{{ message }} <br />
-				<img id="url" width="20%"/>
-			</div>
+		<partial name="current-upload" v-if="upload == 'uploaded'"></partial>
 
-		</div>
-
-		<div class="row row-hv-centered">
+		<div class="row row-hv-centered" id="last-uploads" v-if="logged==true">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<h5>Your last uploads:</h5> <br />
+				<h3>Your last uploads:</h3> <br />
 				<ul>
 					<li v-for="photo in photos" style="display: inline;">
-						<img v-bind:src="photo.filePayload" width="20%" height="20%" class="img-circle">
+						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
 					</li>
 				</ul>
 			</div>
