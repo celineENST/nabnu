@@ -1,4 +1,4 @@
-var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
+ var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
 
 // We use a partial for a html template with data binding inside
 Vue.partial('current-upload',`
@@ -83,26 +83,33 @@ var app = new Vue({
 			self.upload= "uploading";
 			// Fetching the chosen photo
 			var file = $("#inputPhoto")[0].files[0];
-			var fileType = /image.*/;
-			// If it is an image, then we read the file and create a 64bits version that we can read
-			if (file.type.match(fileType)) {
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					var img = new Image();
-					img.src = reader.result;
-					// Security wise hashing - it's not that useful for now but who knows if we're going to need it after when we want to share a single image (by the URL)
-					var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(img.src));
-					// Creating the firebase object
-					var f = new Firebase(ref + "pola/" + self.usr + "/" + hash + '/filePayload');
-					// Display the image we've just uploaded
-					f.set(img.src,function() {
-						self.url = img.src;
-						self.upload="uploaded";
-					});
+			var fileType = /image.*/
+			// If no image has been selected
+			if($('#inputPhoto').val()==''){
+				alert("Select a photo!");
+			}else{
+				// If it is an image, then we read the file and create a 64bits version that we can read
+				if (file.type.match(fileType)) {
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						var img = new Image();
+						img.src = reader.result;
+						// Security wise hashing - it's not that useful for now but who knows if we're going to need it after when we want to share a single image (by the URL)
+						var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(img.src));
+						// Creating the firebase object
+						var f = new Firebase(ref + "pola/" + self.usr + "/" + hash + '/filePayload');
+						// Display the image we've just uploaded
+						f.set(img.src,function() {
+							self.url = img.src;
+							self.upload="uploaded";
+						});
+					}
+					reader.readAsDataURL(file); 
+					//console.log($('#inputPhoto').val());
+					$('#inputPhoto').val('');
+				} else {
+						alert("File not supported !");
 				}
-				reader.readAsDataURL(file); 
-			} else {
-					alert("File not supported !");
 			}
 		}
 	}
