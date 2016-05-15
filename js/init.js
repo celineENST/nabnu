@@ -5,7 +5,7 @@ Vue.partial('current-upload',`
 	<div class="row row-hv-centered" id="current-upload">
 		<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 			<h3>{{ upload }} </h3><br />
-			<img width="20%" v-bind:src="url"/>
+			<img class="frame_polaroid" width="20%" v-bind:src="url"/>
 		</div>
 	</div>
 `);

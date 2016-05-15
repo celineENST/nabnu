@@ -77,3 +77,20 @@ h3, h4 {
 #sign-up {
 	background-color: #EEEEEE;
 }
+
+/*** POLAROID FRAME ***/
+.frame_polaroid{
+	padding: 6px 6px 12px 6px;
+	background: #eee6d8;
+	background: -webkit-linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
+	background: -moz-linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
+	background: -o-linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
+	background: -ms-linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
+	background: linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
+	/* Shadow */
+	-webkit-box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
+	-moz-box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
+	box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
+}
+
+
