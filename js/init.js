@@ -5,7 +5,12 @@ Vue.partial('current-upload',`
 	<div class="row row-hv-centered" id="current-upload">
 		<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 			<h3>{{ upload }} </h3><br />
-			<img class="frame_polaroid" width="20%" v-bind:src="url"/>
+			<div class="frame_polaroid">
+			<figure>
+				<img width="100%" v-bind:src="url"/>
+				<figcaption>{{ text }}</figcaption>
+			</figure>
+			</div>
 		</div>
 	</div>
 `);
@@ -81,6 +86,7 @@ var app = new Vue({
 		// Upload Photo
 		uploadPhoto: function() {
 			var self = this;
+			console.log(self);
 			self.upload= "uploading";
 			// Fetching the chosen photo
 			var file = $("#inputPhoto")[0].files[0];
@@ -103,10 +109,10 @@ var app = new Vue({
 						f.set(img.src,function() {
 							self.url = img.src;
 							self.upload="uploaded";
+							self.text = $('#inputPhotoName').val();
 						});
 					}
 					reader.readAsDataURL(file); 
-					//console.log($('#inputPhoto').val());
 					$('#inputPhoto').val('');
 				} else {
 						alert("File not supported !");
