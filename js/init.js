@@ -20,6 +20,7 @@ var app = new Vue({
 		userPrompt: "Already a User?",
 		email: "",
 		pwd: "",
+		usr: "",
 		// Upload data
 		upload: "please upload a file",
 		url: ""
@@ -122,9 +123,11 @@ function fetchUserFeed(usrUid) {
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
+	var self = this;
 	if (authData) {
 		fetchUserFeed(authData.uid);
 		app.logged = true;
+		self.usr = authData.uid;
 		console.log("User " + authData.uid + " is logged in with " + authData.provider);
 	} else {
 		app.logged = false;
