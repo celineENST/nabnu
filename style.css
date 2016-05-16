@@ -79,8 +79,8 @@ h3, h4 {
 }
 
 /*** POLAROID FRAME ***/
-.frame_polaroid{
-	padding: 6px 6px 12px 6px;
+.frame_polaroid figure{
+	padding: 6px 6px 2px 6px;
 	background: #eee6d8;
 	background: -webkit-linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
 	background: -moz-linear-gradient(top, #ede1c9, #fef8e2 20%, #f2ebde 60%);
@@ -91,6 +91,13 @@ h3, h4 {
 	-webkit-box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
 	-moz-box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
 	box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
+}
+
+.frame_polaroid {
+	/*setting a width and adding overflow:hidden will clear the floats we're going to apply to figure*/
+	width:20%;
+	overflow:hidden;
+	transform: translateX(200%);
 }
 
 

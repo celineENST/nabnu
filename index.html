@@ -59,6 +59,7 @@
 		<div class="row row-hv-centered" id="upload-form" v-if="logged==true">
 			<div class="center-content margin-bottom">
 				<input type="file" accept="image/*" capture="camera" id="inputPhoto" class="form-control">
+				<input type="text" id="inputPhotoName" class="form-control" style="margin-top:2px;" placeholder="Name my photo">
 			</div>
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="uploadPhoto()">
