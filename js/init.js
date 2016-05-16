@@ -73,6 +73,7 @@ var app = new Vue({
 					// Resetting the fields
 					self.email ="";
 					self.pwd ="";
+					self.usr = authData.uid;
 					fetchUserFeed(self.usr);
 				}
 			});
