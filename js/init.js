@@ -30,6 +30,14 @@ var app = new Vue({
 		upload: "please upload a file",
 		url: ""
 	},
+	ready: function() {
+		var authData = ref.getAuth();
+		if (authData) {
+			app.logged = true;
+			app.usr = authData.uid;
+			console.log("User " + authData.uid + " is logged in with " + authData.provider);
+		}
+	}, 
 	methods: {
 		// Create User
 		createUser: function() {
@@ -65,7 +73,7 @@ var app = new Vue({
 					// Resetting the fields
 					self.email ="";
 					self.pwd ="";
-					fetchUserFeed(authData.uid);
+					fetchUserFeed(self.usr);
 				}
 			});
 		},
@@ -124,16 +132,15 @@ var app = new Vue({
 
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
 function fetchUserFeed(usrUid) {
-	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + usrUid).limitToFirst(5));
+	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + usrUid).limitToLast(5));
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
-	var self = this;
 	if (authData) {
 		fetchUserFeed(authData.uid);
 		app.logged = true;
-		self.usr = authData.uid;
+		app.usr = authData.uid;
 		console.log("User " + authData.uid + " is logged in with " + authData.provider);
 	} else {
 		app.logged = false;
