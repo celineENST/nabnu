@@ -94,6 +94,7 @@ var app = new Vue({
 			this.logged = false;
 			this.upload = "please upload a file"
 			alert("Logging out");
+			location.reload();
 		},
 		// Authentication Method - updating the messages
 		toggleUser : function() {
@@ -112,7 +113,7 @@ var app = new Vue({
 		uploadPhoto: function() {
 			var self = this;
 			var now = new Date();
-			var t = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate();
+			var t = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate(); // YYYYMMDD
 			var c = $('#inputPhotoName').val();
 			this.upload= "uploading";
 			// Fetching the chosen photo
