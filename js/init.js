@@ -114,37 +114,50 @@ var app = new Vue({
 			var self = this;
 			var now = new Date();
 			var t = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate(); // YYYYMMDD
-			var c = $('#inputPhotoName').val();
-			this.upload= "uploading";
-			// Fetching the chosen photo
-			var file = $("#inputPhoto")[0].files[0];
-			var fileType = /image.*/
-			// If no image has been selected
-			if ($('#inputPhoto').val()==''){
-				alert("Select a photo!");
-			} else {
-				// If it is an image, then we read the file and create a 64bits version that we can read
-				if (file.type.match(fileType)) {
-					var reader = new FileReader();
-					reader.onload = function(e) {
-						var img = new Image();
-						img.src = reader.result;
-						// Creating the firebase object
-						var f = new Firebase(ref + "pola/" + self.usr).push({
-							timestamp: t,
-							filePayload: img.src,
-							caption: c
-						},function() { // Callback
-							self.url = img.src;
-							self.upload = "uploaded";
-						});
+			// Prevent user from uploading more than one photo per day
+			var vide;
+			var ref1 = new Firebase(ref + "pola/" + self.usr).on("value", function(snapshot){
+				vide = snapshot.val();
+			});
+			var ref2 = new Firebase(ref + "pola/" + self.usr).limitToLast(1).once("value", function(snapshot){
+				var key = snapshot.val();
+				if (!vide || key[Object.keys(key)].timestamp != t){
+					var c = $('#inputPhotoName').val();
+					this.upload= "uploading";
+					// Fetching the chosen photo
+					var file = $("#inputPhoto")[0].files[0];
+					var fileType = /image.*/
+					// If no image has been selected
+					if ($('#inputPhoto').val()==''){
+						alert("Select a photo!");
+					} else {
+						// If it is an image, then we read the file and create a 64bits version that we can read
+						if (file.type.match(fileType)) {
+							var reader = new FileReader();
+							reader.onload = function(e) {
+								var img = new Image();
+								img.src = reader.result;
+								// Creating the firebase object
+								var f = new Firebase(ref + "pola/" + self.usr).push({
+									timestamp: t,
+									filePayload: img.src,
+									caption: c
+								},function() { // Callback
+									self.url = img.src;
+									self.upload = "uploaded";
+								});
+							}
+							reader.readAsDataURL(file); 
+							$('#inputPhoto').val('');
+						} else {
+							alert("File not supported !");
+						}
 					}
-					reader.readAsDataURL(file); 
-					$('#inputPhoto').val('');
 				} else {
-					alert("File not supported !");
+					alert("You have already uploaded a photo today! \nSee you tomorrow for new adventures!");
 				}
-			}
+			});
+
 		}
 	}
 });
