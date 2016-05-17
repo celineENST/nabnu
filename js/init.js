@@ -87,7 +87,6 @@ var authComponent = Vue.extend({
 		}
 	}
 });
-Vue.component("authentication-component",authComponent);
 
 /******* CURRENTUPLOAD COMPONENT *******/
 var currentUploadComponent = Vue.extend({
@@ -220,7 +219,6 @@ var loggedComponent = Vue.extend({
 		"last-uploads-component" : lastUploadsComponent
 	}
 });
-Vue.component("logged-component",loggedComponent);
 
 // This is our principal vue.
 var app = new Vue({
@@ -241,6 +239,10 @@ var app = new Vue({
 			alert("Logging out");
 			location.reload();
 		}
+	},
+	components: {
+		"logged-component" : loggedComponent,
+		"authentication-component" : authComponent
 	}
 });
 

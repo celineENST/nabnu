@@ -18,15 +18,14 @@
 	<script src="https://cdn.jsdelivr.net/vue/latest/vue.js"></script>
 	<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
 	<script src="https://cdn.jsdelivr.net/vuefire/1.0.0/vuefire.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/0.7.10/vue-router.min.js"></script>
 
 	<!-- Stylesheet -->
 	<link rel="stylesheet" href="style.css" />
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
 	<!-- Fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Work+Sans:400,600,700,800,900,500,300' rel='stylesheet' type='text/css' />
 	<link href='https://fonts.googleapis.com/css?family=Quicksand:400,700,300' rel='stylesheet' type='text/css'>
-
 </head>
 
 <body>
@@ -40,7 +39,7 @@
 		</div>
 
 		<!-- AUTHENTICATION COMPONENT -->
-		<authentication-component></authentication-component>
+		<authentication-component :is="currentView"></authentication-component>
 
 		<!-- LOGGED IN COMPONENT -->
 		<logged-component v-if="logged==true" :usr="usr" :photos="photos"></logged-component>
