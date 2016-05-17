@@ -38,41 +38,12 @@
 				<h2>nabnu</h2>
 			</div>
 		</div>
-		<div class="row row-hv-centered" id="sign-up" v-if="logged!=true">
-			<div class="col-md-4 col-xs-12 col-lg-4 center-content">
-				<h3>{{ authentication }}</h3>
-				<div class="input-group margin-bottom">
-						<span class="input-group-addon" id="basic-addon1">@</span>
-						<input type="text" class="form-control" placeholder="Email" v-model="email">
-				</div>
-				<div class="margin-bottom">
-					<input type="password" class="form-control" placeholder="Password" v-model="pwd" @keyup.enter="loginSignup">
-				</div>
-				<button type="button" class="btn btn-default quicksand" @click="loginSignup()">
-					{{ authentication }}
-				</button>
-				<button type="button" class="btn btn-warning quicksand" @click="toggleUser()">
-					{{ userPrompt }}
-				</button>
-			</div>
-		</div>
 
-		<div class="row row-hv-centered" id="upload-form" v-if="logged==true">
-			<div class="center-content margin-bottom">
-				<input type="file" accept="image/*" capture="camera" id="inputPhoto" class="form-control">
-				<input type="text" id="inputPhotoName" class="form-control" style="margin-top:2px;" placeholder="Name my photo">
-			</div>
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="uploadPhoto()">
-					Upload my photo
-				</button>
-			</div>
-		</div>
+		<!-- AUTHENTICATION COMPONENT -->
+		<authentication-component></authentication-component>
 
-		<partial name="current-upload" v-if="upload == 'uploaded'"></partial>
-
-		<partial name="last-uploads" v-if="logged == true"></partial>
-
+		<!-- LOGGED IN COMPONENT -->
+		<logged-component v-if="logged==true" :usr="usr" :photos="photos"></logged-component>
 	</div>
 
 	<script src="js/init.js"></script>

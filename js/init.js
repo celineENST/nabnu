@@ -1,50 +1,34 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
-var k;
-// We use a partial for a html template with data binding inside
-Vue.partial('current-upload',`
-	<div class="row row-hv-centered" id="current-upload">
-		<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-			<h3>{{ upload }} </h3><br />
-			<div class="frame_polaroid">
-			<figure>
-				<img width="100%" v-bind:src="url"/>
-				<figcaption>{{ text }}</figcaption>
-			</figure>
+
+/******* AUTHENTICATION COMPONENT *******/
+var authComponent = Vue.extend({
+	template: `
+		<div class="row row-hv-centered" id="sign-up" v-if="this.$parent.logged!=true">
+			<div class="col-md-4 col-xs-12 col-lg-4 center-content">
+				<h3>{{ authentication }}</h3>
+				<div class="input-group margin-bottom">
+						<span class="input-group-addon" id="basic-addon1">@</span>
+						<input type="text" class="form-control" placeholder="Email" v-model="email">
+				</div>
+				<div class="margin-bottom">
+					<input type="password" class="form-control" placeholder="Password" v-model="pwd" @keyup.enter="loginSignup">
+				</div>
+				<button type="button" class="btn btn-default quicksand" @click="loginSignup()">
+					{{ authentication }}
+				</button>
+				<button type="button" class="btn btn-warning quicksand" @click="toggleUser()">
+					{{ userPrompt }}
+				</button>
 			</div>
 		</div>
-	</div>
-`);
-
-// We use a partial for the last uploads so that it's compiled again everytime we insert it (binding the photos ref again)
-Vue.partial('last-uploads',`
-	<div class="row row-hv-centered" id="last-uploads">
-		<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-			<h3>Your last uploads:</h3> <br />
-			<ul>
-				<li v-for="photo in photos" style="display: inline;">
-					<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
-				</li>
-			</ul>
-		</div>
-	</div>
-`);
-
-// This is our principal vue. We are going to break it down in different vues in the next steps.
-var app = new Vue({
-	el: '#app',
-	data: {
-		// Authentication data
-		logged: false,
-		authentication: "Log In",
-		userPrompt: "No Account?",
-		email: "",
-		pwd: "",
-		usr: "",
-		// Upload data
-		upload: "please upload a file",
-		url: ""
-	}, 
-	firebase : {
+	`,
+	data: function() {
+		return {
+			authentication: "Log In",
+			userPrompt: "No Account?",
+			email: "",
+			pwd: ""
+		}
 	},
 	methods: {
 		// Login User
@@ -89,13 +73,6 @@ var app = new Vue({
 				self.login();
 			}			
 		},
-		logOut: function(){
-			ref.unauth();
-			this.logged = false;
-			this.upload = "please upload a file"
-			alert("Logging out");
-			location.reload();
-		},
 		// Authentication Method - updating the messages
 		toggleUser : function() {
 			switch (this.authentication) {
@@ -108,7 +85,54 @@ var app = new Vue({
 					this.userPrompt = "Already a user?";
 					break;
 			}
-		},
+		}
+	}
+});
+Vue.component("authentication-component",authComponent);
+
+/******* CURRENTUPLOAD COMPONENT *******/
+var currentUploadComponent = Vue.extend({
+	props: ["url"],
+	template: `
+		<div class="row row-hv-centered" id="current-upload">
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<h3>{{ upload }} </h3><br />
+				<div class="frame_polaroid">
+				<figure>
+					<img width="100%" v-bind:src="url"/>
+					<figcaption>{{ text }}</figcaption>
+				</figure>
+				</div>
+			</div>
+		</div>
+	`
+})
+
+/******* UPLOAD COMPONENT *******/
+var uploadComponent = Vue.extend({
+	props: ["usr"],
+	template: `
+		<div class="row row-hv-centered" id="upload-form">
+			<div class="center-content margin-bottom">
+				<input type="file" accept="image/*" capture="camera" id="inputPhoto" class="form-control">
+				<input type="text" id="inputPhotoName" class="form-control" style="margin-top:2px;" placeholder="Name my photo">
+			</div>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="uploadPhoto()">
+					Upload my photo
+				</button>
+			</div>
+		</div>
+		<!-- UPLOADED FILE COMPONENT -->
+		<current-upload v-if="upload == 'uploaded'" :url="url"></current-upload>
+	`,
+	data: function() {
+		return {
+			upload: "please upload a file",
+			url: ""
+		}
+	},
+	methods: {
 		// Upload Photo
 		uploadPhoto: function() {
 			var self = this;
@@ -149,6 +173,7 @@ var app = new Vue({
 							}
 							reader.readAsDataURL(file); 
 							$('#inputPhoto').val('');
+							$('#inputPhotoName').val('');
 						} else {
 							alert("File not supported !");
 						}
@@ -157,15 +182,73 @@ var app = new Vue({
 					alert("You have already uploaded a photo today! \nSee you tomorrow for new adventures!");
 				}
 			});
+		}
+	},
+	components: {
+		"current-upload" : currentUploadComponent
+	}
+});
 
+/******* LAST UPLOADS COMPONENT *******/
+var lastUploadsComponent = Vue.extend({
+	props: ["photos"],
+	template: `
+		<div class="row row-hv-centered" id="last-uploads">
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<h3>Your last uploads:</h3> <br />
+				<ul>
+					<li v-for="photo in photos" style="display: inline;">
+						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
+					</li>
+				</ul>
+			</div>
+		</div>
+	`
+});
+
+/******* LOGGED COMPONENT *******/
+var loggedComponent = Vue.extend({
+	props: ['usr','photos'],
+	template: `
+		<!-- FILE UPLOAD COMPONENT -->
+		<upload-component :usr="usr"></upload-component>
+		<!-- LAST UPLOADS COMPONENT -->
+		<last-uploads-component :photos="photos"></last-uploads-component>
+	`,
+	components: {
+		"upload-component" : uploadComponent,
+		"last-uploads-component" : lastUploadsComponent
+	}
+});
+Vue.component("logged-component",loggedComponent);
+
+// This is our principal vue.
+var app = new Vue({
+	el: '#app',
+	data: {
+		// Authentication data
+		logged: false,
+		usr: ""
+	}, 
+	firebase : {
+	},
+	methods: {
+		// Logging out
+		logOut: function (){
+			ref.unauth();
+			this.logged = false;
+			uploadComponent.upload = "please upload a file"
+			alert("Logging out");
+			location.reload();
 		}
 	}
 });
 
+/******* GLOBAL FUNCTIONS *******/
+
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
 function fetchUserFeed() {
-	var itemRef = new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr);
-	app.$bindAsArray("photos",itemRef.limitToLast(5));
+	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(5));
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
