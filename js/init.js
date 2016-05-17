@@ -48,7 +48,7 @@ var app = new Vue({
 			}, function(error, userData) {
 				if (error) {
 					console.log("Error creating user:", error);
-					alert("Couldn't create user!");
+					alert("Couldn't create user!  \n" + error);
 					return;
 				} else {
 					console.log("Successfully created user account with uid:", userData.uid);
@@ -69,6 +69,7 @@ var app = new Vue({
 			}, function(error, authData) {
 				if (error) {
 					console.log("Login Failed!", error);
+					alert("Login Failed! \n" + error);
 				} else {
 					// Resetting the fields
 					self.email ="";
