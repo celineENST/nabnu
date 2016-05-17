@@ -13,27 +13,25 @@
 
 "pola" : {
 	"uid" : {
-		"timeStamp1": {
-			"hash1": {
-				"filePayload": "photo1",
-			}
+		"pushID1" : {
+			"timestamp" : "date1",
+			"filePayload" : "photo1",
+			"caption" : "blabla"
 		},
-		"timeStamp2": {
-			"hash2" : {
-				"filePayload": "photo2",
-			}
+		"pushID2": {
+			"timestamp" : "date2",
+			"filePayload" : "photo2",
 		}
 	},
 	"two" : {
-		"timeStamp1": {
-			"hash1": {
-				"filePayload": "photo1",
-			}
+		"pushID1" : {
+			"timestamp" : "date1",
+			"filePayload" : "photo1",
+			"caption" : "blabla"
 		},
-		"timeStamp2": {
-			"hash2" : {
-				"filePayload": "photo2",
-			}
+		"pushID2": {
+			"timestamp" : "date2",
+			"filePayload" : "photo2",
 		}
 	}
 }
