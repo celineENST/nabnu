@@ -45,7 +45,7 @@
 		<logged-component v-if="logged==true" :usr="usr" :photos="photos"></logged-component>
 
 		<!-- SEARCH AND FOLLOW USER COMPONENT -->
-		<search-component :usr="usr"></search-component>
+		<search-component v-if="logged==true" :usr="usr"></search-component>
 	</div>
 
 	<script src="js/init.js"></script>

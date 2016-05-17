@@ -305,20 +305,21 @@ var searchComponent = Vue.extend({
 		followUser: function(){
 			var self = this;
 			var fb = ref;
+			var test=false;
 			self.followDone = true;
 			$('#searchResults').text('');
 			fb.child('/follow').once('value', function (snap) {
 				var k=snap.val();
 				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-					var followingId = self.following; 
+					
 					if(element == self.follower){
-
-					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following).set(true)
-					}
-					else{
-					 						
+					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following).set(true);
+					 	var test = true;
 					}
 				})
+				if(test=false){
+						alert("Couldn't follow user");				 						
+				}
 			});
 		}
 	}
