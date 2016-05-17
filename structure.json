@@ -1,12 +1,15 @@
 "follow" : {
-	"uid0" : {
+	"uid0" :{
+		"uid0" : false,
 		"uid1" : true,
 		"uid2" : true
 	},
 	"uid1" : {
+		"uid0": false,
 		"uid0": true
 	},
 	"uid2": {
+		"uid2": false,
 		"uid1" : true
 	}
 },
@@ -34,4 +37,9 @@
 			"filePayload" : "photo2",
 		}
 	}
+}
+
+"users" : {
+	"uid0" : "mail@kth.se",
+	"uid1" : "email2@kth.se"
 }

@@ -73,6 +73,30 @@
 
 		<partial name="last-uploads" v-if="logged == true"></partial>
 
+		<div class="row row-hv-centered" id="upload-form" v-if="logged == true" style="background-color:white;">
+			<h3> Follow your friends </h3>
+			<div class="center-content margin-bottom">
+				<input type="text" id="inputSearchUser" class="form-control" style="margin-top:2px;" placeholder="search by email">
+			</div>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="searchUser()">
+					Search
+				</button>
+				
+				<div id="searchResults" v-if="searching==true && followDone!=true"> 
+					<h3>Results</h3> 
+					<p> {{inputEmail}} <button class="btn btn-default btn-info quicksand" @click="followUser()">Follow</button>
+				</div>
+				<div id="searchResults" v-else></div>
+				<div id="searchResults" v-if="searching==true && followDone==true"> 
+					<h3>Results</h3> 
+					<p>{{inputEmail}} <button class="btn btn-primary disabled">Following</button>
+				</div>
+				
+			</div>
+		</div>
+		
+
 	</div>
 
 	<script src="js/init.js"></script>

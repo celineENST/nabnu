@@ -1,4 +1,5 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
+ var k;
 
 // We use a partial for a html template with data binding inside
 Vue.partial('current-upload',`
@@ -42,7 +43,12 @@ var app = new Vue({
 		usr: "",
 		// Upload data
 		upload: "please upload a file",
-		url: ""
+		url: "",
+		follower: "",
+		following: "",
+		inputEmail: "",
+		searching: "",
+		followDone: ""
 	}, 
 	firebase : {
 	},
@@ -75,6 +81,12 @@ var app = new Vue({
 					alert("Couldn't create user!  \n" + error);
 					return;
 				} else {
+					var userId = userData.uid;
+					// Creating the firebase object
+					var f = new Firebase(ref + "users/" + userData.uid).set({
+							email: self.email
+					});
+					var f2 = new Firebase(ref + "follow/" + userData.uid + "/" + userData.uid).set(false);
 					self.login();
 				}
 			});
@@ -144,7 +156,73 @@ var app = new Vue({
 					alert("File not supported !");
 				}
 			}
+		},
+		//Search a user by email
+		searchUser: function(){
+			var self = this;
+			var email = $('#inputSearchUser').val();
+			console.log(email);
+			var fb = ref;
+
+			if( email ){ 
+				loadRecord(email);  
+			}
+			else { 
+				$('pre').text('not found'); 
+			}
+
+			//Search for the email in the data under users
+			function loadRecord(email) {
+ 				fb.child('users/').once('value', function (snap) {
+ 					k=snap.val();
+ 					var foundUser = false;
+ 					Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+ 						if(k[element].email == email){
+ 							self.follower = self.usr;
+ 							self.following = element;
+ 							console.log(self.follower);
+ 							console.log(self.following);
+ 							self.searching = true;
+ 							foundUser = true;
+ 							self.inputEmail = k[element].email;
+ 						}
+ 					})
+ 					//The following conditions check what will be displayed to the user
+ 					if (foundUser == true && self.followDone == true) {
+ 						$('#searchResults').text(' ');
+ 					}
+ 					if(foundUser == false){
+ 						self.searching = false;
+ 						$('#searchResults').text('No user with that email address');
+ 					}
+ 				});
+			}
+		},
+		//Follow a user
+		followUser: function(){
+		var self = this;
+		var fb = ref;
+		self.followDone = true;
+		$('#searchResults').text('');
+		console.log("jhbasdia");
+		console.log(self.follower);
+		console.log(self.following);
+		fb.child('/follow').once('value', function (snap) {
+			var k=snap.val();
+			Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+				var followingId = self.following; 
+				if(element == self.follower){
+
+				 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following).set(true)
+				}
+				else{
+				 						
+				}
+			})
+		});
 		}
+
+		
 	}
 });
 
@@ -166,3 +244,4 @@ function authDataCallback(authData) {
 	}
 }
 ref.onAuth(authDataCallback);
+
