@@ -21,8 +21,8 @@ var app = new Vue({
 	data: {
 		// Authentication data
 		logged: false,
-		authentication: "Sign Up",
-		userPrompt: "Already a User?",
+		authentication: "Log In",
+		userPrompt: "No Account?",
 		email: "",
 		pwd: "",
 		usr: "",
