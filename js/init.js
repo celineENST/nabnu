@@ -15,6 +15,20 @@ Vue.partial('current-upload',`
 	</div>
 `);
 
+// We use a partial for the last uploads so that it's compiled again everytime we insert it (binding the photos ref again)
+Vue.partial('last-uploads',`
+	<div class="row row-hv-centered" id="last-uploads">
+		<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+			<h3>Your last uploads:</h3> <br />
+			<ul>
+				<li v-for="photo in photos" style="display: inline;">
+					<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
+				</li>
+			</ul>
+		</div>
+	</div>
+`);
+
 // This is our principal vue. We are going to break it down in different vues in the next steps.
 var app = new Vue({
 	el: '#app',
@@ -29,14 +43,9 @@ var app = new Vue({
 		// Upload data
 		upload: "please upload a file",
 		url: ""
-	},
-	ready: function() {
-		var authData = ref.getAuth();
-		if (authData) {
-			app.logged = true;
-			app.usr = authData.uid;
-		}
 	}, 
+	firebase : {
+	},
 	methods: {
 		// Create User
 		createUser: function() {
@@ -69,7 +78,7 @@ var app = new Vue({
 					// Resetting the fields
 					self.email ="";
 					self.pwd ="";
-					fetchUserFeed(self.usr);
+					fetchUserFeed();
 				}
 			});
 		},
@@ -81,15 +90,14 @@ var app = new Vue({
 		},
 		// Authentication Method - updating the messages
 		toggleUser : function() {
-			var self = this;
-			switch (self.authentication) {
+			switch (this.authentication) {
 				case "Sign Up":
-					self.authentication = "Log In";
-					self.userPrompt = "No Account?";
+					this.authentication = "Log In";
+					this.userPrompt = "No Account?";
 					break;
 				case "Log In":
-					self.authentication = "Sign Up";
-					self.userPrompt = "Already a user?";
+					this.authentication = "Sign Up";
+					this.userPrompt = "Already a user?";
 					break;
 			}
 		},
@@ -99,7 +107,7 @@ var app = new Vue({
 			var now = new Date();
 			var t = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate();
 			var c = $('#inputPhotoName').val();
-			self.upload= "uploading";
+			this.upload= "uploading";
 			// Fetching the chosen photo
 			var file = $("#inputPhoto")[0].files[0];
 			var fileType = /image.*/
@@ -134,17 +142,19 @@ var app = new Vue({
 });
 
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
-function fetchUserFeed(usrUid) {
-	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + usrUid).limitToLast(5));
+function fetchUserFeed() {
+	var itemRef = new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr);
+	app.$bindAsArray("photos",itemRef.limitToLast(5));
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
 	if (authData) {
-		fetchUserFeed(authData.uid);
-		app.logged = true;
 		app.usr = authData.uid;
+		fetchUserFeed();
+		app.logged = true;
 	} else {
+		app.usr = "";
 		app.logged = false;
 	}
 }

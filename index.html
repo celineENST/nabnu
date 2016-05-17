@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Poloveroid</title>
+	<title>nabnu</title>
 
 	<!-- CONFIGURATION -->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -35,7 +35,7 @@
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<div class="glyphicon glyphicon-log-out" style="font-size:1.5em;" @click="logOut()" v-if="logged==true"></div>
 				<h2><span class="glyphicon glyphicon-camera"></span></h2>
-				<h2>Poloveroid</h2>
+				<h2>nabnu</h2>
 			</div>
 		</div>
 		<div class="row row-hv-centered" id="sign-up" v-if="logged!=true">
@@ -46,7 +46,7 @@
 						<input type="text" class="form-control" placeholder="Email" v-model="email">
 				</div>
 				<div class="margin-bottom">
-					<input type="password" class="form-control" placeholder="Password" v-model="pwd">
+					<input type="password" class="form-control" placeholder="Password" v-model="pwd" @keyup.enter="loginSignup">
 				</div>
 				<button type="button" class="btn btn-default quicksand" @click="loginSignup()">
 					{{ authentication }}
@@ -71,16 +71,8 @@
 
 		<partial name="current-upload" v-if="upload == 'uploaded'"></partial>
 
-		<div class="row row-hv-centered" id="last-uploads" v-if="logged==true">
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<h3>Your last uploads:</h3> <br />
-				<ul>
-					<li v-for="photo in photos" style="display: inline;">
-						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
-					</li>
-				</ul>
-			</div>
-		</div>
+		<partial name="last-uploads" v-if="logged == true"></partial>
+
 	</div>
 
 	<script src="js/init.js"></script>
