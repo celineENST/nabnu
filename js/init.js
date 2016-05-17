@@ -35,7 +35,6 @@ var app = new Vue({
 		if (authData) {
 			app.logged = true;
 			app.usr = authData.uid;
-			console.log("User " + authData.uid + " is logged in with " + authData.provider);
 		}
 	}, 
 	methods: {
@@ -47,12 +46,9 @@ var app = new Vue({
 				password : self.pwd
 			}, function(error, userData) {
 				if (error) {
-					console.log("Error creating user:", error);
 					alert("Couldn't create user!  \n" + error);
 					return;
-				} else {
-					console.log("Successfully created user account with uid:", userData.uid);
-				}
+				} 
 			});
 		},
 		// Sign user if needed and then log user in 
@@ -68,7 +64,6 @@ var app = new Vue({
 				password : self.pwd
 			}, function(error, authData) {
 				if (error) {
-					console.log("Login Failed!", error);
 					alert("Login Failed! \n" + error);
 				} else {
 					// Resetting the fields
@@ -81,7 +76,7 @@ var app = new Vue({
 		logOut: function(){
 			var self = this;
 			self.logged = false;
-			alert("Deconnexion!");
+			alert("Logging out");
 		},
 		// Authentication Method - updating the messages
 		toggleUser : function() {
@@ -108,9 +103,9 @@ var app = new Vue({
 			var file = $("#inputPhoto")[0].files[0];
 			var fileType = /image.*/
 			// If no image has been selected
-			if($('#inputPhoto').val()==''){
+			if ($('#inputPhoto').val()==''){
 				alert("Select a photo!");
-			}else{
+			} else {
 				// If it is an image, then we read the file and create a 64bits version that we can read
 				if (file.type.match(fileType)) {
 					var reader = new FileReader();
@@ -122,7 +117,7 @@ var app = new Vue({
 							timestamp: t,
 							filePayload: img.src,
 							caption: c
-						},function() {
+						},function() { // Callback
 							self.url = img.src;
 							self.upload = "uploaded";
 						});
@@ -130,7 +125,7 @@ var app = new Vue({
 					reader.readAsDataURL(file); 
 					$('#inputPhoto').val('');
 				} else {
-						alert("File not supported !");
+					alert("File not supported !");
 				}
 			}
 		}
@@ -148,10 +143,8 @@ function authDataCallback(authData) {
 		fetchUserFeed(authData.uid);
 		app.logged = true;
 		app.usr = authData.uid;
-		console.log("User " + authData.uid + " is logged in with " + authData.provider);
 	} else {
 		app.logged = false;
-		console.log("User is logged out");
 	}
 }
 ref.onAuth(authDataCallback);
