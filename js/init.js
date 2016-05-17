@@ -79,6 +79,11 @@ var app = new Vue({
 				}
 			});
 		},
+		logOut: function(){
+			var self = this;
+			self.logged = false;
+			alert("Deconnexion!");
+		},
 		// Authentication Method - updating the messages
 		toggleUser : function() {
 			var self = this;
