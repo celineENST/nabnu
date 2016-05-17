@@ -1,0 +1,39 @@
+"follow" : {
+	"uid0" : {
+		"uid1" : true,
+		"uid2" : true
+	},
+	"uid1" : {
+		"uid0": true
+	},
+	"uid2": {
+		"uid1" : true
+	}
+},
+
+"pola" : {
+	"uid" : {
+		"timeStamp1": {
+			"hash1": {
+				"filePayload": "photo1",
+			}
+		},
+		"timeStamp2": {
+			"hash2" : {
+				"filePayload": "photo2",
+			}
+		}
+	},
+	"two" : {
+		"timeStamp1": {
+			"hash1": {
+				"filePayload": "photo1",
+			}
+		},
+		"timeStamp2": {
+			"hash2" : {
+				"filePayload": "photo2",
+			}
+		}
+	}
+}

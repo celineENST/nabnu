@@ -73,7 +73,6 @@ var app = new Vue({
 					// Resetting the fields
 					self.email ="";
 					self.pwd ="";
-					self.usr = authData.uid;
 					fetchUserFeed(self.usr);
 				}
 			});
@@ -113,9 +112,12 @@ var app = new Vue({
 						// Security wise hashing - it's not that useful for now but who knows if we're going to need it after when we want to share a single image (by the URL)
 						var hash = CryptoJS.SHA256(Math.random() + CryptoJS.SHA256(img.src));
 						// Creating the firebase object
+						// Check storage with children ID 
 						var f = new Firebase(ref + "pola/" + self.usr + "/" + hash + '/filePayload');
 						// Display the image we've just uploaded
 						f.set(img.src,function() {
+							var now = new Date();
+							var timestamp = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate();
 							self.url = img.src;
 							self.upload="uploaded";
 							self.text = $('#inputPhotoName').val();
