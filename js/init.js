@@ -44,7 +44,6 @@ var authComponent = Vue.extend({
 					// Resetting the fields
 					self.email ="";
 					self.pwd ="";
-					fetchUserFeed();
 				}
 			});
 		},
@@ -139,48 +138,49 @@ var uploadComponent = Vue.extend({
 			var now = new Date();
 			var t = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate(); // YYYYMMDD
 			// Prevent user from uploading more than one photo per day
-			var vide;
-			var ref1 = new Firebase(ref + "pola/" + self.usr).on("value", function(snapshot){
-				vide = snapshot.val();
+			var empty = null;
+			new Firebase(ref + "pola/" + self.usr).on("value", function(snapshot){
+				empty = snapshot.val();
 			});
-			var ref2 = new Firebase(ref + "pola/" + self.usr).limitToLast(1).once("value", function(snapshot){
+			new Firebase(ref + "pola/" + self.usr).limitToLast(1).once("value", function(snapshot){
 				var key = snapshot.val();
-				if (!vide || key[Object.keys(key)].timestamp != t){
-					var c = $('#inputPhotoName').val();
-					this.upload= "uploading";
-					// Fetching the chosen photo
-					var file = $("#inputPhoto")[0].files[0];
-					var fileType = /image.*/
-					// If no image has been selected
-					if ($('#inputPhoto').val()==''){
-						alert("Select a photo!");
-					} else {
-						// If it is an image, then we read the file and create a 64bits version that we can read
-						if (file.type.match(fileType)) {
-							var reader = new FileReader();
-							reader.onload = function(e) {
-								var img = new Image();
-								img.src = reader.result;
-								// Creating the firebase object
-								var f = new Firebase(ref + "pola/" + self.usr).push({
-									timestamp: t,
-									filePayload: img.src,
-									caption: c
-								},function() { // Callback
-									self.url = img.src;
-									self.upload = "uploaded";
-								});
-							}
-							reader.readAsDataURL(file); 
-							$('#inputPhoto').val('');
-							$('#inputPhotoName').val('');
-						} else {
-							alert("File not supported !");
-						}
-					}
+				if (!empty || key[Object.keys(key)].timestamp != t) {
+					self.readImage(self,t);
 				} else {
 					alert("You have already uploaded a photo today! \nSee you tomorrow for new adventures!");
 				}
+			});
+		},
+		// Read the photo 
+		readImage: function(context,t) {
+			context.upload= "uploading";
+			var file = $("#inputPhoto")[0].files[0]; // Fetching the chosen photo
+			var fileType = /image.*/
+			if ($('#inputPhoto').val()==''){ // If no image has been selected
+				alert("Select a photo!");
+			} else if (file.type.match(fileType)) { // Else we read the file and create a 64bits version
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var img = new Image();
+					img.src = reader.result;
+					context.uploadToFirebase(context,t,img.src);
+				}
+				reader.readAsDataURL(file); 
+			} else {
+				alert("File not supported !");
+			}
+		},
+		// Upload to Firebase
+		uploadToFirebase : function(context,t,source) {
+			var f = new Firebase(ref + "pola/" + context.usr).push({
+				timestamp: t,
+				filePayload: source,
+				caption: $('#inputPhotoName').val()
+			},function() { // Callback showing the uploaded photo and clearing the fields
+				context.url = source;
+				context.upload = "uploaded";
+				$('#inputPhoto').val('');
+				$('#inputPhotoName').val('');
 			});
 		}
 	},
