@@ -1,5 +1,5 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
-
+var k;
 // We use a partial for a html template with data binding inside
 Vue.partial('current-upload',`
 	<div class="row row-hv-centered" id="current-upload">
