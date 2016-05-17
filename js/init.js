@@ -74,9 +74,8 @@ var app = new Vue({
 			});
 		},
 		logOut: function(){
-			ref.unauth();
-			this.logged = false;
-			this.upload = "please upload a file"
+			var self = this;
+			self.logged = false;
 			alert("Logging out");
 		},
 		// Authentication Method - updating the messages
