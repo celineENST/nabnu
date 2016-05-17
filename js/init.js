@@ -47,27 +47,9 @@ var app = new Vue({
 	firebase : {
 	},
 	methods: {
-		// Create User
-		createUser: function() {
+		// Login User
+		login: function() {
 			var self = this;
-			ref.createUser({
-				email    : self.email,
-				password : self.pwd
-			}, function(error, userData) {
-				if (error) {
-					alert("Couldn't create user!  \n" + error);
-					return;
-				} 
-			});
-		},
-		// Sign user if needed and then log user in 
-		loginSignup: function() {
-			var self = this;
-			// We check if we need to create a new account first
-			if (self.authentication == "Sign Up") {
-				self.createUser();
-			}; 
-			// If not, we just log them in
 			ref.authWithPassword({
 				email    : self.email,
 				password : self.pwd
@@ -81,6 +63,31 @@ var app = new Vue({
 					fetchUserFeed();
 				}
 			});
+		},
+		// Create User
+		createUser: function() {
+			var self = this;
+			ref.createUser({
+				email    : self.email,
+				password : self.pwd
+			}, function(error, userData) {
+				if (error) {
+					alert("Couldn't create user!  \n" + error);
+					return;
+				} else {
+					self.login();
+				}
+			});
+		},
+		// Sign user if needed and then log user in 
+		loginSignup: function() {
+			var self = this;
+			// We check if we need to create a new account first
+			if (self.authentication == "Sign Up") {
+				self.createUser();
+			} else { // If not, we just log them in
+				self.login();
+			}			
 		},
 		logOut: function(){
 			ref.unauth();
