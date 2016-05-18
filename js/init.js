@@ -212,6 +212,44 @@ var lastUploadsComponent = Vue.extend({
 	`
 });
 
+/******* MY FRIENDS PHOTOS ********/
+// /!\ TODO change user photos into friends photos
+var myFriendsFeedComponent = Vue.extend({
+	props: ["photos"],
+	template: `
+		<div class="row row-hv-centered" id="my-friends-feed-component">
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<h3>My friends feed:</h3> <br />
+				<div id="container">
+				<div v-for="photo in photos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
+					<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+					</img>
+				</div>
+			</div>
+			</div>
+		</div>
+	`,
+	methods: {
+		// Swipe a photo
+		swipe: function(){
+			console.log($(".swipingPicture"));
+			// Swiper Right: save the picture into my feed
+			$(".swipingPicture").on("swiperight",function(){
+      			$(this).addClass('rotate-left').delay(700).fadeOut(1);
+      			$('.swipingPicture').find('.status').remove();
+      			$(this).append('<div class="status save">Save in my feed!</div>');      
+    		});  
+
+		    // Swiper Left: delete the picture
+		    $(".swipingPicture").on("swipeleft",function(){
+		    	$(this).addClass('rotate-right').delay(700).fadeOut(1);
+		        $('.swipingPicture').find('.status').remove();
+		        $(this).append('<div class="status delete">Delete!</div>');
+		    });
+		}
+	}
+});
+
 /******* LOGGED COMPONENT *******/
 var loggedComponent = Vue.extend({
 	props: ['usr','photos'],
@@ -220,10 +258,13 @@ var loggedComponent = Vue.extend({
 		<upload-component :usr="usr"></upload-component>
 		<!-- LAST UPLOADS COMPONENT -->
 		<last-uploads-component :photos="photos"></last-uploads-component>
+		<!-- MY FRIENDS FEED COMPONENT -->
+		<my-friends-feed-component :photos="photos"></my-friends-feed-component>
 	`,
 	components: {
 		"upload-component" : uploadComponent,
-		"last-uploads-component" : lastUploadsComponent
+		"last-uploads-component" : lastUploadsComponent,
+		"my-friends-feed-component" : myFriendsFeedComponent
 	}
 });
 
