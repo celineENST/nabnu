@@ -244,7 +244,7 @@ var searchComponent = Vue.extend({
 					<h3>Results</h3> 
 					<p> {{inputEmail}} <button class="btn btn-default btn-info quicksand" @click="followUser()">Follow</button>
 				</div>
-				<div id="searchResults" v-else></div>
+				<div id="searchResults" v-if="searching==false"></div>
 				<div id="searchResults" v-if="searching==true && followDone==true"> 
 					<h3>Results</h3> 
 					<p>{{inputEmail}} <button class="btn btn-primary disabled">Following</button>
@@ -266,7 +266,6 @@ var searchComponent = Vue.extend({
 		searchUser: function(){
 			var self = this;
 			var email = $('#inputSearchUser').val();
-			console.log(email);
 			var fb = ref;
 
 			if( email ){ 
@@ -280,18 +279,55 @@ var searchComponent = Vue.extend({
 			function loadRecord(email) {
  				fb.child('users/').once('value', function (snap) {
  					k=snap.val();
- 					var foundUser = false;
+ 					var foundUser;
+ 					//search for the user with that email, If a found him save id of follower, following
  					Object.getOwnPropertyNames(k).forEach(function(element,index,array){
  						if(k[element].email == email){
  							self.follower = self.usr;
  							self.following = element;
- 							self.searching = true;
- 							foundUser = true;
  							self.inputEmail = k[element].email;
+
+ 							//check if you already follow that user(look for following userId unde the follower userId )
+		 					var f = new Firebase(ref + "follow/" + self.follower);
+		 					var followingCheck = self.following;
+		 					f.once("value", function(snapshot) {
+			 					var a = snapshot.child(followingCheck).exists();
+			 					//if there is a record
+			 					if (a == true){
+			 						f.once("value", function(snapshot){
+			 							var data = snapshot.child(followingCheck).val();
+			 							//if the record=true(user follows him)
+			 							if(data == true){
+			 								self.followDone = true;
+			 								self.searching = true;
+			 								foundUser = true;
+			 							}
+			 							//record = false (user doesnt follow him anymore)
+			 							else{
+			 								self.followDone = false;
+			 								self.searching = true;
+			 								foundUser = true;
+			 							}
+			 						})
+			 						
+			 					}
+			 					else{
+			 						self.followDone = false;
+			 						self.searching = true;
+			 						foundUser = true;
+			 					}
+			 				})
+ 						}
+ 						else{
+ 							foundUser = false;
  						}
  					})
+
  					//The following conditions check what will be displayed to the user
  					if (foundUser == true && self.followDone == true) {
+ 						$('#searchResults').text(' ');
+ 					}
+ 					if (foundUser == true && self.followDone == false) {
  						$('#searchResults').text(' ');
  					}
  					if(foundUser == false){
@@ -317,7 +353,7 @@ var searchComponent = Vue.extend({
 					 	var test = true;
 					}
 				})
-				if(test=false){
+				if(test==false){
 						alert("Couldn't follow user");				 						
 				}
 			});
