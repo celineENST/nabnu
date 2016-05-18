@@ -281,14 +281,17 @@ var searchComponent = Vue.extend({
 					Search
 				</button>
 				
-				<div id="searchResults" v-if="searching==true && followDone!=true"> 
+				<div id="searchResults" v-if="(searching==true && followDone!=true) || unfollowDone == true"> 
 					<h3>Results</h3> 
 					<p> {{inputEmail}} <button class="btn btn-default btn-info quicksand" @click="followUser()">Follow</button>
 				</div>
-				<div id="searchResults" v-if="searching==false"></div>
-				<div id="searchResults" v-if="searching==true && followDone==true"> 
+				<div id="searchResults1" v-if="searching==true && followDone==true && unfollowDone!=true"> 
 					<h3>Results</h3> 
-					<p>{{inputEmail}} <button class="btn btn-primary disabled">Following</button>
+					<p>{{inputEmail}} <button class="btn btn-primary" @click="unfollowUser()">Unfollow</button>
+				</div>
+				<div id="searchResults2" v-if="foundUser == false">
+					<h3>Results</h3>
+					<p>{{searchErrorMsg}}
 				</div>
 				
 			</div>
@@ -298,17 +301,21 @@ var searchComponent = Vue.extend({
 			follower: "",
 			following: "",
 			inputEmail: "",
-			searching: "",
-			followDone: ""	
+			searching: null,
+			followDone: "",
+			unfollowDone: "",
+			searchError:false,
+			searchErrorMsg:" ",
+			foundUser: null
 		}
 	},
 	methods:{
 		//Search a user by email
 		searchUser: function(){
 			var self = this;
+			self.searchError = false;
 			var email = $('#inputSearchUser').val();
 			var fb = ref;
-
 			if( email ){ 
 				loadRecord(email);  
 			}
@@ -320,14 +327,16 @@ var searchComponent = Vue.extend({
 			function loadRecord(email) {
  				fb.child('users/').once('value', function (snap) {
  					k=snap.val();
- 					var foundUser;
+ 					self.searching = null;
+ 					self.searchErrorMsg = " ";
+ 					self.searchError = false;
+ 					self.foundUser = false;
  					//search for the user with that email, If a found him save id of follower, following
  					Object.getOwnPropertyNames(k).forEach(function(element,index,array){
  						if(k[element].email == email){
  							self.follower = self.usr;
  							self.following = element;
  							self.inputEmail = k[element].email;
-
  							//check if you already follow that user(look for following userId unde the follower userId )
 		 					var f = new Firebase(ref + "follow/" + self.follower);
 		 					var followingCheck = self.following;
@@ -341,13 +350,15 @@ var searchComponent = Vue.extend({
 			 							if(data == true){
 			 								self.followDone = true;
 			 								self.searching = true;
-			 								foundUser = true;
+			 								self.foundUser= true;
+			 								self.searchErrorMsg = " ";
 			 							}
 			 							//record = false (user doesnt follow him anymore)
 			 							else{
 			 								self.followDone = false;
 			 								self.searching = true;
-			 								foundUser = true;
+			 								self.foundUser= true;
+			 								self.searchErrorMsg = " ";
 			 							}
 			 						})
 			 						
@@ -355,25 +366,15 @@ var searchComponent = Vue.extend({
 			 					else{
 			 						self.followDone = false;
 			 						self.searching = true;
-			 						foundUser = true;
+			 						self.foundUser= true;
+			 						self.searchErrorMsg = " ";
 			 					}
 			 				})
- 						}
- 						else{
- 							foundUser = false;
+
  						}
  					})
-
- 					//The following conditions check what will be displayed to the user
- 					if (foundUser == true && self.followDone == true) {
- 						$('#searchResults').text(' ');
- 					}
- 					if (foundUser == true && self.followDone == false) {
- 						$('#searchResults').text(' ');
- 					}
- 					if(foundUser == false){
- 						self.searching = false;
- 						$('#searchResults').text('No user with that email address');
+ 					if(self.foundUser == false ){
+ 							self.searchErrorMsg = "User not found. Check the email address.";
  					}
  				});
 			}
@@ -392,11 +393,27 @@ var searchComponent = Vue.extend({
 					if(element == self.follower){
 					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following).set(true);
 					 	var test = true;
+					 	self.unfollowDone = false;
 					}
 				})
 				if(test==false){
-						alert("Couldn't follow user");				 						
+						//alert("Couldn't follow user");				 						
 				}
+			});
+		},
+		unfollowUser: function(){
+			var self = this;
+			var fb = ref;
+			fb.child('/follow/' + self.follower + '/').once('value', function (snap) {
+				var k=snap.val();
+				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+					
+					if(element == self.following){
+					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following).set(false);
+					 	self.unfollowDone = true;
+					}
+				})
+				
 			});
 		}
 	}
