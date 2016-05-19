@@ -468,6 +468,15 @@ var app = new Vue({
 
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
 function fetchUserFeed() {
+	/*fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
+	fb.child(app.usr).once('value', function (snap) {
+ 		var k=snap.val();
+ 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+ 			if(k[element].following == true){
+ 				app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + element).limitToLast(5));
+ 			}
+ 		})	
+	});*/
 	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(5));
 }
 
