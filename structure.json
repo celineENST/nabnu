@@ -1,8 +1,8 @@
 "follow" : {
 	"uid0" :{
 		"uid0": {
-			"follow": false,
-			"liked":{
+			"following": false,
+			"like":{
 					"idImg": "biksjks",
 					"idImg": "saugsuiagsia"
 					},
@@ -11,8 +11,8 @@
 					"idImg": "hdbskskd"
 			},
 		"uid0": {
-			"follow": true,
-			"liked":{
+			"following": true,
+			"like":{
 					"idImg": "biksjks",
 					"idImg": "saugsuiagsia"
 					},
@@ -24,8 +24,8 @@
 	},
 	"uid1" : {
 		"uid1": {
-			"follow": false,
-			"liked":{
+			"following": false,
+			"like":{
 					"idImg": "biksjks",
 					"idImg": "saugsuiagsia"
 					},
@@ -34,7 +34,7 @@
 					"idImg": "hdbskskd"
 			},
 		"uid0": {
-			"follow": true,
+			"following": true,
 			"liked":{
 					"idImg": "biksjks",
 					"idImg": "saugsuiagsia"
