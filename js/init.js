@@ -117,7 +117,7 @@ var currentUploadComponent = Vue.extend({
 
 /******* UPLOAD COMPONENT *******/
 var uploadComponent = Vue.extend({
-	props: ["usr"],
+	props: ["usr","currentView","url"],
 	template: `
 		<div class="row row-hv-centered" id="upload-form">
 			<div class="center-content margin-bottom">
@@ -130,13 +130,10 @@ var uploadComponent = Vue.extend({
 				</button>
 			</div>
 		</div>
-		<!-- UPLOADED FILE COMPONENT -->
-		<current-upload v-if="upload == 'uploaded'" :url="url"></current-upload>
 	`,
 	data: function() {
 		return {
-			upload: "please upload a file",
-			url: ""
+			upload: "please upload a file"
 		}
 	},
 	methods: {
@@ -189,11 +186,9 @@ var uploadComponent = Vue.extend({
 				context.upload = "uploaded";
 				$('#inputPhoto').val('');
 				$('#inputPhotoName').val('');
+				context.currentView = 'current-upload'
 			});
 		}
-	},
-	components: {
-		"current-upload" : currentUploadComponent
 	}
 });
 
@@ -252,23 +247,6 @@ var myFriendsFeedComponent = Vue.extend({
 	}
 });
 
-/******* LOGGED COMPONENT *******/
-var loggedComponent = Vue.extend({
-	props: ['usr','photos'],
-	template: `
-		<!-- FILE UPLOAD COMPONENT -->
-		<upload-component :usr="usr"></upload-component>
-		<!-- LAST UPLOADS COMPONENT -->
-		<last-uploads-component :photos="photos"></last-uploads-component>
-		<!-- MY FRIENDS FEED COMPONENT -->
-		<my-friends-feed-component :photos="photos"></my-friends-feed-component>
-	`,
-	components: {
-		"upload-component" : uploadComponent,
-		"last-uploads-component" : lastUploadsComponent,
-		"my-friends-feed-component" : myFriendsFeedComponent
-	}
-});
 
 /****** SEARCH-FOLLOW USER COMPONENT *******/
 var searchComponent = Vue.extend({
@@ -417,6 +395,44 @@ var searchComponent = Vue.extend({
 	}
 });
 
+
+/******* LOGGED COMPONENT *******/
+var loggedComponent = Vue.extend({
+	props: ['usr','photos'],
+	data: function() {
+		return {
+			currentView: 'upload-component',
+			url: ""
+		}
+	},
+	template: `
+		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView">
+		</component>
+		<p>
+			<a @click="go('upload-component')">Upload</a>
+			<a @click="go('my-friends-feed-component')">My Friends</a>
+			<a @click="go('search-component')">Search</a>
+			<a @click="go('last-uploads-component')">Last Uploads</a>
+			<a @click="logOut()">Log Out</a>
+		</p>
+	`,
+	methods: {
+		go: function(comp) {
+			this.currentView = comp;
+		},
+		logOut: function() {
+			app.logOut();
+		}
+	},
+	components: {
+		"upload-component" : uploadComponent,
+		"last-uploads-component" : lastUploadsComponent,
+		"my-friends-feed-component" : myFriendsFeedComponent,
+		"search-component" : searchComponent,
+		"current-upload" : currentUploadComponent
+	}
+});
+
 // This is our principal vue.
 var app = new Vue({
 	el: '#app',
@@ -440,7 +456,6 @@ var app = new Vue({
 	components: {
 		"logged-component" : loggedComponent,
 		"authentication-component" : authComponent,
-		"search-component" : searchComponent
 	}
 });
 
@@ -462,4 +477,5 @@ function authDataCallback(authData) {
 		app.logged = false;
 	}
 }
+
 ref.onAuth(authDataCallback);

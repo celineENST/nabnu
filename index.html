@@ -27,8 +27,7 @@
 	<!-- Fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Work+Sans:400,600,700,800,900,500,300' rel='stylesheet' type='text/css' />
 	<link href='https://fonts.googleapis.com/css?family=Quicksand:400,700,300' rel='stylesheet' type='text/css'>
-	<!-- For the swiping thing but it changes the style of the previous sheets -->
-	<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />-->
+
 </head>
 
 <body>
@@ -42,13 +41,11 @@
 		</div>
 
 		<!-- AUTHENTICATION COMPONENT -->
-		<authentication-component :is="currentView"></authentication-component>
+		<authentication-component></authentication-component>
 
 		<!-- LOGGED IN COMPONENT -->
 		<logged-component v-if="logged==true" :usr="usr" :photos="photos"></logged-component>
 
-		<!-- SEARCH AND FOLLOW USER COMPONENT -->
-		<search-component v-if="logged==true" :usr="usr"></search-component>
 	</div>
 
 	<script src="js/init.js"></script>
