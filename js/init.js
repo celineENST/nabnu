@@ -392,6 +392,7 @@ var searchComponent = Vue.extend({
 					 	self.unfollowDone = false;
 					}
 				})
+			},function() {
 				if(test==false){
 					alert("Couldn't follow user");				 						
 				}
