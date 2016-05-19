@@ -216,7 +216,7 @@ var myFriendsFeedComponent = Vue.extend({
 	template: `
 		<div class="row row-hv-centered" id="friends-feed">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
-				<h3>Friends' Feed</h3> <br />
+				<h3>Friends Feed</h3> <br />
 				<div id="container">
 				<div v-for="photo in photos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
 					<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">

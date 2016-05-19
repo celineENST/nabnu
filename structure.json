@@ -1,16 +1,49 @@
 "follow" : {
 	"uid0" :{
-		"uid0" : false,
-		"uid1" : true,
-		"uid2" : true
+		"uid0": {
+			"follow": false,
+			"liked":{
+					"idImg": "biksjks",
+					"idImg": "saugsuiagsia"
+					},
+			"dislike":{
+					"idImg": "bksdnsjsks",
+					"idImg": "hdbskskd"
+			},
+		"uid0": {
+			"follow": true,
+			"liked":{
+					"idImg": "biksjks",
+					"idImg": "saugsuiagsia"
+					},
+			"dislike":{
+					"idImg": "bksdnsjsks",
+					"idImg": "hdbskskd"
+			}
+		}
 	},
 	"uid1" : {
-		"uid0": false,
-		"uid0": true
-	},
-	"uid2": {
-		"uid2": false,
-		"uid1" : true
+		"uid1": {
+			"follow": false,
+			"liked":{
+					"idImg": "biksjks",
+					"idImg": "saugsuiagsia"
+					},
+			"dislike":{
+					"idImg": "bksdnsjsks",
+					"idImg": "hdbskskd"
+			},
+		"uid0": {
+			"follow": true,
+			"liked":{
+					"idImg": "biksjks",
+					"idImg": "saugsuiagsia"
+					},
+			"dislike":{
+					"idImg": "bksdnsjsks",
+					"idImg": "hdbskskd"
+			}
+		}
 	}
 },
 
@@ -37,7 +70,7 @@
 			"filePayload" : "photo2",
 		}
 	}
-}
+},
 
 "users" : {
 	"uid0" : "mail@kth.se",
