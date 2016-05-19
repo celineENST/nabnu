@@ -328,6 +328,7 @@ var searchComponent = Vue.extend({
 				 					//if there is a record
 				 					if (a == true) {
 				 						f.once("value", function(snapshot){
+				 							var data = snapshot.child(followingCheck + "/following").val();
 				 							//if the record=true(user follows him)
 				 							if(data == true){
 				 								self.followDone = true;
