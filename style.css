@@ -37,6 +37,16 @@ body {
 	align-items: center;
 	justify-content: center;
 }
+.no-margin-no-padding {
+  margin: 0!important;
+  padding: 0!important;
+}
+.center-flex-column {
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center;
+}
 /*** TITLES ***/
 
 h1,h2,h3,h4,h5 {
@@ -100,12 +110,16 @@ h3, h4 {
 	transform: translateX(200%);
 }
 
-/*** SWIPING THING ***/
+/*** FRIENDS FEED ***/
+#friends-feed {
+  background-color: #EEEEEE;
+}
+
 #container {
   display: block;
   position: relative;
-  width:200px;
-  height: 200px;
+  width:160px;
+  height: 160px;
   list-style-type: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -113,7 +127,6 @@ h3, h4 {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  transform: translateX(40%);
 }
 
 .swipingPicture {
@@ -124,8 +137,6 @@ h3, h4 {
   padding: 20px;
   width: 160px;
   height: 160px;
-  top: -20px;
-  left: 50px;
   position: absolute;
   cursor: hand;
 }

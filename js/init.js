@@ -1,5 +1,7 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
- var k;
+
+// Hide the loading message
+$.mobile.loading().hide();
 
 /******* AUTHENTICATION COMPONENT *******/
 var authComponent = Vue.extend({
@@ -200,9 +202,9 @@ var lastUploadsComponent = Vue.extend({
 	props: ["photos"],
 	template: `
 		<div class="row row-hv-centered" id="last-uploads">
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
 				<h3>Your last uploads:</h3> <br />
-				<ul>
+				<ul class="no-margin-no-padding">
 					<li v-for="photo in photos" style="display: inline;">
 						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
 					</li>
@@ -217,9 +219,9 @@ var lastUploadsComponent = Vue.extend({
 var myFriendsFeedComponent = Vue.extend({
 	props: ["photos"],
 	template: `
-		<div class="row row-hv-centered" id="my-friends-feed-component">
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<h3>My friends feed:</h3> <br />
+		<div class="row row-hv-centered" id="friends-feed">
+			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
+				<h3>Friends' Feed</h3> <br />
 				<div id="container">
 				<div v-for="photo in photos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
 					<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
@@ -271,16 +273,16 @@ var loggedComponent = Vue.extend({
 /****** SEARCH-FOLLOW USER COMPONENT *******/
 var searchComponent = Vue.extend({
 	props: ['usr'],
-	template: `<div class="row row-hv-centered" id="upload-form" style="background-color:white;">
+	template: `
+		<div class="row row-hv-centered" id="upload-form" style="background-color:white;">
 			<h3> Follow your friends </h3>
 			<div class="center-content margin-bottom">
-				<input type="text" id="inputSearchUser" class="form-control" style="margin-top:2px;" placeholder="search by email">
+				<input type="text" id="inputSearchUser" class="form-control" placeholder="search by email">
 			</div>
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="searchUser()">
 					Search
 				</button>
-				
 				<div id="searchResults" v-if="(searching==true && followDone!=true) || unfollowDone == true"> 
 					<h3>Results</h3> 
 					<p> {{inputEmail}} <button class="btn btn-default btn-info quicksand" @click="followUser()">Follow</button>
@@ -293,9 +295,9 @@ var searchComponent = Vue.extend({
 					<h3>Results</h3>
 					<p>{{searchErrorMsg}}
 				</div>
-				
 			</div>
-		</div>`,
+		</div>
+	`,
 	data: function(){
 		return {
 			follower: "",
@@ -326,14 +328,14 @@ var searchComponent = Vue.extend({
 			//Search for the email in the data under users
 			function loadRecord(email) {
  				fb.child('users/').once('value', function (snap) {
- 					k=snap.val();
+ 					var k=snap.val();
  					self.searching = null;
  					self.searchErrorMsg = " ";
  					self.searchError = false;
  					self.foundUser = false;
  					//search for the user with that email, If a found him save id of follower, following
  					Object.getOwnPropertyNames(k).forEach(function(element,index,array){
- 						if(k[element].email == email){
+ 						if(k[element].email == email) {
  							self.follower = self.usr;
  							self.following = element;
  							self.inputEmail = k[element].email;
@@ -343,7 +345,7 @@ var searchComponent = Vue.extend({
 		 					f.once("value", function(snapshot) {
 			 					var a = snapshot.child(followingCheck).exists();
 			 					//if there is a record
-			 					if (a == true){
+			 					if (a == true) {
 			 						f.once("value", function(snapshot){
 			 							var data = snapshot.child(followingCheck).val();
 			 							//if the record=true(user follows him)
@@ -352,34 +354,29 @@ var searchComponent = Vue.extend({
 			 								self.searching = true;
 			 								self.foundUser= true;
 			 								self.searchErrorMsg = " ";
-			 							}
-			 							//record = false (user doesnt follow him anymore)
-			 							else{
+			 							} else{ //record = false (user doesnt follow him anymore)
 			 								self.followDone = false;
 			 								self.searching = true;
 			 								self.foundUser= true;
 			 								self.searchErrorMsg = " ";
 			 							}
-			 						})
-			 						
-			 					}
-			 					else{
+			 						});
+			 					} else {
 			 						self.followDone = false;
 			 						self.searching = true;
 			 						self.foundUser= true;
 			 						self.searchErrorMsg = " ";
 			 					}
-			 				})
-
+			 				});
  						}
- 					})
+ 					});
  					if(self.foundUser == false ){
- 							self.searchErrorMsg = "User not found. Check the email address.";
+ 						self.searchErrorMsg = "User not found. Check the email address.";
  					}
  				});
-			}
+			};
 		},
-		//Follow a user
+		// Follow a user
 		followUser: function(){
 			var self = this;
 			var fb = ref;
@@ -389,7 +386,6 @@ var searchComponent = Vue.extend({
 			fb.child('/follow').once('value', function (snap) {
 				var k=snap.val();
 				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-					
 					if(element == self.follower){
 					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following).set(true);
 					 	var test = true;
@@ -397,10 +393,11 @@ var searchComponent = Vue.extend({
 					}
 				})
 				if(test==false){
-						//alert("Couldn't follow user");				 						
+					alert("Couldn't follow user");				 						
 				}
 			});
 		},
+		// Unfollow a user
 		unfollowUser: function(){
 			var self = this;
 			var fb = ref;
@@ -443,7 +440,7 @@ var app = new Vue({
 		"logged-component" : loggedComponent,
 		"authentication-component" : authComponent,
 		"search-component" : searchComponent
-			}
+	}
 });
 
 /******* GLOBAL FUNCTIONS *******/
