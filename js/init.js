@@ -37,6 +37,7 @@ var authComponent = Vue.extend({
 		// Login User
 		login: function() {
 			var self = this;
+			console.log(self);
 			ref.authWithPassword({
 				email    : self.email,
 				password : self.pwd
@@ -212,17 +213,17 @@ var lastUploadsComponent = Vue.extend({
 /******* MY FRIENDS PHOTOS ********/
 // /!\ TODO change user photos into friends photos
 var myFriendsFeedComponent = Vue.extend({
-	props: ["photos"],
-	template: `
-		<div class="row row-hv-centered" id="friends-feed">
+	props: ["friendsphotos"],
+	template: `		
+		<div class="row row-hv-centered" id="my-friends-feed">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
 				<h3>Friends Feed</h3> <br />
 				<div id="container">
-				<div v-for="photo in photos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
-					<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
-					</img>
+					<div v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						</img>
+					</div>
 				</div>
-			</div>
 			</div>
 		</div>
 	`,
@@ -403,7 +404,7 @@ var searchComponent = Vue.extend({
 
 /******* LOGGED COMPONENT *******/
 var loggedComponent = Vue.extend({
-	props: ['usr','photos'],
+	props: ['usr','photos','friendsphotos'],
 	data: function() {
 		return {
 			currentView: 'upload-component',
@@ -411,7 +412,7 @@ var loggedComponent = Vue.extend({
 		}
 	},
 	template: `
-		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView">
+		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos">
 		</component>
 		<p>
 			<a @click="go('upload-component')">Upload</a>
@@ -468,23 +469,38 @@ var app = new Vue({
 
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
 function fetchUserFeed() {
-	/*fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
-	fb.child(app.usr).once('value', function (snap) {
- 		var k=snap.val();
- 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
- 			if(k[element].following == true){
- 				app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + element).limitToLast(5));
- 			}
- 		})	
-	});*/
 	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(5));
+}
+
+function fetchFriendFeed() {
+	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + "/images").limitToLast(5));
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
 	if (authData) {
 		app.usr = authData.uid;
+
+		// fetching friends photos
+		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
+		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
+		
+		fb.child(app.usr).on('value', function (snap) {
+	 		var k=snap.val();
+	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+	 			if(k[element].following == true){
+	 				fbf.child(element).on('value', function (snapf) {
+	 					var kf = snapf.val();
+	 					nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
+	 					nf.set(kf); 
+	 					//app.$bindAsArray("friendsphotos", nf);	
+	 					console.log(app.friendsphotos);
+	 				});
+	 			}
+	 		});
+		});
 		fetchUserFeed();
+		fetchFriendFeed();
 		app.logged = true;
 	} else {
 		app.usr = "";
