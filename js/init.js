@@ -252,7 +252,7 @@ var myFriendsFeedComponent = Vue.extend({
 var searchComponent = Vue.extend({
 	props: ['usr'],
 	template: `
-		<div class="row row-hv-centered" id="upload-form" style="background-color:white;">
+		<div class="row row-hv-centered" id="search" style="background-color:white;">
 			<h3> Follow your friends </h3>
 			<div class="center-content margin-bottom">
 				<input type="text" id="inputSearchUser" class="form-control" placeholder="search by email">
@@ -413,13 +413,14 @@ var loggedComponent = Vue.extend({
 	template: `
 		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView">
 		</component>
-		<p>
-			<a @click="go('upload-component')">Upload</a>
-			<a @click="go('my-friends-feed-component')">My Friends</a>
-			<a @click="go('search-component')">Search</a>
-			<a @click="go('last-uploads-component')">Last Uploads</a>
-			<a @click="logOut()">Log Out</a>
-		</p>
+		<div id="nav" class="row">
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="glyphicon glyphicon-home"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'search-component'}" @click="go('search-component')"><span class="glyphicon glyphicon-search"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'upload-component'}" @click="go('upload-component')"><span class="glyphicon glyphicon-camera"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'likes'}" @click="go('likes')"><span class="glyphicon glyphicon-heart"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'last-uploads-component'}" @click="go('last-uploads-component')"><span class="glyphicon glyphicon-user"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" @click="logOut()"><span class="glyphicon glyphicon-log-out"></span></div>
+		</div>
 	`,
 	methods: {
 		go: function(comp) {
@@ -456,6 +457,9 @@ var app = new Vue({
 			uploadComponent.upload = "please upload a file"
 			alert("Logging out");
 			location.reload();
+		},
+		disappear: function() {
+			$("#header").remove();
 		}
 	},
 	components: {
