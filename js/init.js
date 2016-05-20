@@ -37,6 +37,7 @@ var authComponent = Vue.extend({
 		// Login User
 		login: function() {
 			var self = this;
+			console.log(self);
 			ref.authWithPassword({
 				email    : self.email,
 				password : self.pwd
@@ -212,17 +213,17 @@ var lastUploadsComponent = Vue.extend({
 /******* MY FRIENDS PHOTOS ********/
 // /!\ TODO change user photos into friends photos
 var myFriendsFeedComponent = Vue.extend({
-	props: ["photos"],
-	template: `
-		<div class="row row-hv-centered" id="friends-feed">
+	props: ["friendsphotos"],
+	template: `		
+		<div class="row row-hv-centered" id="my-friends-feed">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
 				<h3>Friends Feed</h3> <br />
 				<div id="container">
-				<div v-for="photo in photos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
-					<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
-					</img>
+					<div v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						</img>
+					</div>
 				</div>
-			</div>
 			</div>
 		</div>
 	`,
@@ -274,6 +275,28 @@ var searchComponent = Vue.extend({
 					<p>{{searchErrorMsg}}
 				</div>
 			</div>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<div id="followResults"> 
+					<div>People you follow </div>
+					<button class="btn btn-primary" @click="peopleYouFollow()">Following</button>
+				</div>
+				<ul>
+					<li v-for="item in followings" align="left">
+						{{item}}
+					</li>
+				</ul>
+			</div>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<div id="followResults"> 
+					<button class="btn btn-primary" @click="peopleFollowYou()">Followers</button>
+				</div>
+				<ul>
+					<li v-for="item in followers" align="left">
+						{{item}}
+					</li>
+				</ul>
+			</div>
+			<div v-if="noFollowers==true">{{noFollowersMsg}}</div>
 		</div>
 	`,
 	data: function(){
@@ -286,7 +309,13 @@ var searchComponent = Vue.extend({
 			unfollowDone: "",
 			searchError:false,
 			searchErrorMsg:" ",
-			foundUser: null
+			foundUser: null,
+			followingEmail: "",
+			followerEmail: "",
+			followers:[],
+			followings:[],
+			noFollowers:"",
+			noFollowersMsg:""
 		}
 	},
 	methods:{
@@ -396,6 +425,67 @@ var searchComponent = Vue.extend({
 				})
 				
 			});
+		},
+		peopleYouFollow: function(){
+			self = this;
+			var followings = [];
+			followings.length = 0;
+			var fb = ref;
+			fb.child('/follow/' + app.usr + '/').once('value', function (snap) {
+				var k=snap.val();
+				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+					if(k[element].following == true){
+						var tempId = element;
+						fb2 = ref;
+						fb2.child('/users').once('value',function(snap){
+							var j=snap.val();
+							Object.getOwnPropertyNames(j).forEach(function(element,index,array){
+								if(element == tempId ){
+									self.followings.push(j[element].email);
+								};
+							})
+						});
+					}
+				})
+				
+			});
+		},
+		peopleFollowYou: function(){
+			var followers = [ ];
+			self = this;
+			var fb = ref;
+			self.noFollowers = true;
+			//console.log(noFollowers);
+			fb.child('/follow/').once('value', function (snap) {
+				var k=snap.val();
+				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+					var temp = element;
+					var fb2 = ref;
+					fb2.child('/follow/' + element).once('value', function (snapshot){
+						var j = snapshot.val();
+						Object.getOwnPropertyNames(j).forEach(function(element,index,array){
+							if (element == app.usr && j[element].following == true) {
+								var tempId = temp;
+								fb3 = ref;
+								fb3.child('/users').once('value',function(snap){
+									var g=snap.val();
+									Object.getOwnPropertyNames(g).forEach(function(element,index,array){
+										if(element == tempId ){
+											var data = g[element].email;
+											self.followers.push(data);
+											self.noFollowers = false;
+										};
+									})
+								});
+							}
+						})
+
+					});
+				})
+			})
+			if (self.noFollowers == true) {
+				self.noFollowersMsg = "no one follows you";
+			}
 		}
 	}
 });
@@ -403,7 +493,7 @@ var searchComponent = Vue.extend({
 
 /******* LOGGED COMPONENT *******/
 var loggedComponent = Vue.extend({
-	props: ['usr','photos'],
+	props: ['usr','photos','friendsphotos'],
 	data: function() {
 		return {
 			currentView: 'upload-component',
@@ -411,7 +501,7 @@ var loggedComponent = Vue.extend({
 		}
 	},
 	template: `
-		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView">
+		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos">
 		</component>
 		<div id="nav" class="row">
 			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="glyphicon glyphicon-home"></span></div>
@@ -472,23 +562,37 @@ var app = new Vue({
 
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
 function fetchUserFeed() {
-	/*fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
-	fb.child(app.usr).once('value', function (snap) {
- 		var k=snap.val();
- 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
- 			if(k[element].following == true){
- 				app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + element).limitToLast(5));
- 			}
- 		})	
-	});*/
 	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(5));
+}
+
+function fetchFriendFeed() {
+	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + "/images").limitToLast(5));
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
 	if (authData) {
 		app.usr = authData.uid;
+
+		// fetching friends photos
+		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
+		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
+		nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
+
+		fb.child(app.usr).once('value', function (snap) {
+	 		var k=snap.val();
+	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+	 			if(k[element].following == true){
+	 				fbf.child(element).once('value', function (snapf) {
+	 					var kf = snapf.val();
+	 					nf.update(kf); 	
+	 					console.log(app.friendsphotos);
+	 				});
+	 			}
+	 		});
+		});
 		fetchUserFeed();
+		fetchFriendFeed();
 		app.logged = true;
 	} else {
 		app.usr = "";
