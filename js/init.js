@@ -484,16 +484,15 @@ function authDataCallback(authData) {
 		// fetching friends photos
 		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
-		
-		fb.child(app.usr).on('value', function (snap) {
+		nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
+
+		fb.child(app.usr).once('value', function (snap) {
 	 		var k=snap.val();
 	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
 	 			if(k[element].following == true){
-	 				fbf.child(element).on('value', function (snapf) {
+	 				fbf.child(element).once('value', function (snapf) {
 	 					var kf = snapf.val();
-	 					nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
-	 					nf.set(kf); 
-	 					//app.$bindAsArray("friendsphotos", nf);	
+	 					nf.update(kf); 	
 	 					console.log(app.friendsphotos);
 	 				});
 	 			}
