@@ -275,6 +275,28 @@ var searchComponent = Vue.extend({
 					<p>{{searchErrorMsg}}
 				</div>
 			</div>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<div id="followResults"> 
+					<div>People you follow </div>
+					<button class="btn btn-primary" @click="peopleYouFollow()">Following</button>
+				</div>
+				<ul>
+					<li v-for="item in followings" align="left">
+						{{item}}
+					</li>
+				</ul>
+			</div>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
+				<div id="followResults"> 
+					<button class="btn btn-primary" @click="peopleFollowYou()">Followers</button>
+				</div>
+				<ul>
+					<li v-for="item in followers" align="left">
+						{{item}}
+					</li>
+				</ul>
+			</div>
+			<div v-if="noFollowers==true">{{noFollowersMsg}}</div>
 		</div>
 	`,
 	data: function(){
@@ -287,7 +309,13 @@ var searchComponent = Vue.extend({
 			unfollowDone: "",
 			searchError:false,
 			searchErrorMsg:" ",
-			foundUser: null
+			foundUser: null,
+			followingEmail: "",
+			followerEmail: "",
+			followers:[],
+			followings:[],
+			noFollowers:"",
+			noFollowersMsg:""
 		}
 	},
 	methods:{
@@ -397,6 +425,67 @@ var searchComponent = Vue.extend({
 				})
 				
 			});
+		},
+		peopleYouFollow: function(){
+			self = this;
+			var followings = [];
+			followings.length = 0;
+			var fb = ref;
+			fb.child('/follow/' + app.usr + '/').once('value', function (snap) {
+				var k=snap.val();
+				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+					if(k[element].following == true){
+						var tempId = element;
+						fb2 = ref;
+						fb2.child('/users').once('value',function(snap){
+							var j=snap.val();
+							Object.getOwnPropertyNames(j).forEach(function(element,index,array){
+								if(element == tempId ){
+									self.followings.push(j[element].email);
+								};
+							})
+						});
+					}
+				})
+				
+			});
+		},
+		peopleFollowYou: function(){
+			var followers = [ ];
+			self = this;
+			var fb = ref;
+			self.noFollowers = true;
+			//console.log(noFollowers);
+			fb.child('/follow/').once('value', function (snap) {
+				var k=snap.val();
+				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+					var temp = element;
+					var fb2 = ref;
+					fb2.child('/follow/' + element).once('value', function (snapshot){
+						var j = snapshot.val();
+						Object.getOwnPropertyNames(j).forEach(function(element,index,array){
+							if (element == app.usr && j[element].following == true) {
+								var tempId = temp;
+								fb3 = ref;
+								fb3.child('/users').once('value',function(snap){
+									var g=snap.val();
+									Object.getOwnPropertyNames(g).forEach(function(element,index,array){
+										if(element == tempId ){
+											var data = g[element].email;
+											self.followers.push(data);
+											self.noFollowers = false;
+										};
+									})
+								});
+							}
+						})
+
+					});
+				})
+			})
+			if (self.noFollowers == true) {
+				self.noFollowersMsg = "no one follows you";
+			}
 		}
 	}
 });
