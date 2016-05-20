@@ -550,6 +550,7 @@ var app = new Vue({
 		},
 		disappear: function() {
 			$("#header").remove();
+			$("#content").attr("style","display: visible;");
 		}
 	},
 	components: {

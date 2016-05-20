@@ -98,7 +98,7 @@ h3 {
   color: #A6E500 !important;
 }
 
-#last-uploads, #current-upload, #friends-feed, #search, #upload-form {
+#last-uploads, #current-upload, #my-friends-feed, #search, #upload-form {
     height: 90vh !important;
     background-color: #F1EFE6;
 }

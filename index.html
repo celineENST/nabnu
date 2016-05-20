@@ -38,13 +38,13 @@
 				<h2><span class="glyphicon glyphicon-camera" style="color: #f1f0e5;"></span></h2>
 			</div>
 		</div>
+		<div id="content" style="display: none;">
+			<!-- AUTHENTICATION COMPONENT -->
+			<authentication-component></authentication-component>
 
-		<!-- AUTHENTICATION COMPONENT -->
-		<authentication-component></authentication-component>
-
-		<!-- LOGGED IN COMPONENT -->
-		<logged-component v-if="logged==true" :usr="usr" :photos="photos" :friendsphotos="friendsphotos"></logged-component>
-
+			<!-- LOGGED IN COMPONENT -->
+			<logged-component v-if="logged==true" :usr="usr" :photos="photos" :friendsphotos="friendsphotos"></logged-component>
+		</div>
 	</div>
 
 	<script src="js/init.js"></script>
