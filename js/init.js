@@ -211,7 +211,6 @@ var lastUploadsComponent = Vue.extend({
 });
 
 /******* MY FRIENDS PHOTOS ********/
-// /!\ TODO change user photos into friends photos
 var myFriendsFeedComponent = Vue.extend({
 	props: ["friendsphotos"],
 	template: `		
@@ -230,12 +229,34 @@ var myFriendsFeedComponent = Vue.extend({
 	methods: {
 		// Swipe a photo
 		swipe: function(){
-			console.log($(".swipingPicture"));
+			fbi = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
+
 			// Swiper Right: save the picture into my feed
 			$(".swipingPicture").on("swiperight",function(){
-      			$(this).addClass('rotate-left').delay(700).fadeOut(1);
-      			$('.swipingPicture').find('.status').remove();
-      			$(this).append('<div class="status save">Save in my feed!</div>');      
+				$(this).addClass('rotate-left').delay(700).fadeOut(1);
+  				$('.swipingPicture').find('.status').remove();
+  				$(this).append('<div class="status save">Save in my feed!</div>'); 
+
+				if($(this).find("div").attr("class") == "status save"){
+					var url_image = ($(this).find("img").attr("style").split("url(")[1]).split(");")[0];
+
+					fbi.once('value', function(snap){
+						var k = snap.val();
+						Object.keys(k).forEach(function(element, index, array){
+							if(k[element].filePayload == url_image){ 
+								// Add the photo to the folder /likes
+								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes/' + element);
+								fbil.update(k[element]);
+								console.log("Photo added");
+								// Remove the photo from the folder /images
+								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images/' + element);
+								fbii.remove();
+							}
+						});
+						
+					});   
+				}
+      			  
     		});  
 
 		    // Swiper Left: delete the picture
@@ -243,11 +264,47 @@ var myFriendsFeedComponent = Vue.extend({
 		    	$(this).addClass('rotate-right').delay(700).fadeOut(1);
 		        $('.swipingPicture').find('.status').remove();
 		        $(this).append('<div class="status delete">Delete!</div>');
+
+		        if($(this).find("div").attr("class") == "status delete"){
+					var url_image = ($(this).find("img").attr("style").split("url(")[1]).split(");")[0];
+
+					fbi.once('value', function(snap){
+						var k = snap.val();
+						Object.keys(k).forEach(function(element, index, array){
+							if(k[element].filePayload == url_image){ 
+								// Add the photo to the folder /dislikes
+								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/dislikes/' + element);
+								fbil.update(k[element]);
+								console.log("Photo removed");
+								// Remove the photo from the folder /images
+								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images/' + element);
+								fbii.remove();
+							}
+						});
+						
+					});   
+				}
 		    });
 		}
 	}
 });
 
+/******* LIKES SAVED PHOTOS COMPONENT *******/
+var savedPhotosComponent = Vue.extend({
+	props: ["savedfriendsphotos"],
+	template: `
+		<div class="row row-hv-centered" id="saved-photos-component">
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
+				<h3>Saved Photos:</h3> <br />
+				<ul class="no-margin-no-padding">
+					<li v-for="photo in savedfriendsphotos" style="display: inline;">
+						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
+					</li>
+				</ul>
+			</div>
+		</div>
+	`
+});
 
 /****** SEARCH-FOLLOW USER COMPONENT *******/
 var searchComponent = Vue.extend({
@@ -493,7 +550,7 @@ var searchComponent = Vue.extend({
 
 /******* LOGGED COMPONENT *******/
 var loggedComponent = Vue.extend({
-	props: ['usr','photos','friendsphotos'],
+	props: ['usr','photos','friendsphotos','savedfriendsphotos'],
 	data: function() {
 		return {
 			currentView: 'upload-component',
@@ -501,13 +558,13 @@ var loggedComponent = Vue.extend({
 		}
 	},
 	template: `
-		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos">
+		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos">
 		</component>
 		<div id="nav" class="row">
 			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="glyphicon glyphicon-home"></span></div>
 			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'search-component'}" @click="go('search-component')"><span class="glyphicon glyphicon-search"></span></div>
 			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'upload-component'}" @click="go('upload-component')"><span class="glyphicon glyphicon-camera"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'likes'}" @click="go('likes')"><span class="glyphicon glyphicon-heart"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'saved-photos-component'}" @click="go('saved-photos-component')"><span class="glyphicon glyphicon-heart"></span></div>
 			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'last-uploads-component'}" @click="go('last-uploads-component')"><span class="glyphicon glyphicon-user"></span></div>
 			<div class="link col-md-2 col-xs-2 col-lg-2" @click="logOut()"><span class="glyphicon glyphicon-log-out"></span></div>
 		</div>
@@ -525,7 +582,8 @@ var loggedComponent = Vue.extend({
 		"last-uploads-component" : lastUploadsComponent,
 		"my-friends-feed-component" : myFriendsFeedComponent,
 		"search-component" : searchComponent,
-		"current-upload" : currentUploadComponent
+		"current-upload" : currentUploadComponent,
+		"saved-photos-component" : savedPhotosComponent
 	}
 });
 
@@ -566,34 +624,76 @@ function fetchUserFeed() {
 	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(5));
 }
 
+// Fetching the user's friends' feeds
 function fetchFriendFeed() {
 	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + "/images").limitToLast(5));
+}
+
+// Fetching the user's likes
+function fetchSavedFriendFeed(){
+	// Fetching friends photos
+		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
+		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
+		nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
+		likes = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes');
+		dislikes = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/dislikes');
+
+		// Look for who follows the app.usr
+		fb.child(app.usr).once('value', function (snap) {
+	 		var k=snap.val();
+	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+	 			// 'element' is every id-user that app.usr may follow
+	 			if(k[element].following == true){ // check if the following is effective
+	 				// Fetch the photos from the followed user
+	 				fbf.child(element).once('value', function (snapf) {
+	 					var kf = snapf.val();
+	 					var already = false;
+
+	 					// Check if photos are not already in the likes or dislikes folder of this user
+	 					Object.getOwnPropertyNames(kf).forEach(function(elementf) {
+	 						// 'elementf' is the id of each photo
+	 						// LIKES folder
+	 						likes.once('value', function (snapl){
+	 							var kl = snapl.val();
+	 							if(kl){
+	 								Object.keys(kl).forEach(function(elementl) {
+		 								if(elementl == elementf){
+		 									already = true; 	
+		 								}
+		 							});
+	 							}
+	 							
+	 						});
+	 						// DISLIKES folder
+	 						dislikes.once('value', function(snapd) {
+	 							var kd = snapd.val();
+	 							if(kd){
+	 								Object.keys(kd).forEach(function(elementd) {
+		 								if(elementd == elementf){
+		 									already = true;
+		 								}
+		 							});
+	 							}
+	 						});	 							
+	 					});
+	 					if(!already){
+							nf.update(kf);
+							console.log("Image added");
+						}
+	 				});
+	 			}
+	 		});
+		});
+	app.$bindAsArray("savedfriendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes'));
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
 	if (authData) {
 		app.usr = authData.uid;
-
-		// fetching friends photos
-		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
-		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
-		nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
-
-		fb.child(app.usr).once('value', function (snap) {
-	 		var k=snap.val();
-	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-	 			if(k[element].following == true){
-	 				fbf.child(element).once('value', function (snapf) {
-	 					var kf = snapf.val();
-	 					nf.update(kf); 	
-	 					console.log(app.friendsphotos);
-	 				});
-	 			}
-	 		});
-		});
 		fetchUserFeed();
 		fetchFriendFeed();
+		fetchSavedFriendFeed();
 		app.logged = true;
 	} else {
 		app.usr = "";
