@@ -18,8 +18,8 @@
 	<script src="https://cdn.jsdelivr.net/vue/latest/vue.js"></script>
 	<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
 	<script src="https://cdn.jsdelivr.net/vuefire/1.0.0/vuefire.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/0.7.10/vue-router.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<script src="https://use.fontawesome.com/b79e087f0b.js"></script>
 
 	<!-- Stylesheet -->
 	<link rel="stylesheet" href="style.css" />
@@ -27,7 +27,6 @@
 	<!-- Fonts -->
 	<link href='https://fonts.googleapis.com/css?family=Work+Sans:400,600,700,800,900,500,300' rel='stylesheet' type='text/css' />
 	<link href='https://fonts.googleapis.com/css?family=Quicksand:400,700,300' rel='stylesheet' type='text/css'>
-
 </head>
 
 <body>
@@ -35,7 +34,7 @@
 		<div class="row row-hv-centered" id="header" @click="disappear()">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<h2>nabnu</h2>
-				<h2><span class="glyphicon glyphicon-camera" style="color: #f1f0e5;"></span></h2>
+				<h2><span class="fa fa-camera-retro"></span></h2>
 			</div>
 		</div>
 		<div id="content" style="display: none;">
@@ -46,7 +45,6 @@
 			<logged-component v-if="logged==true" :usr="usr" :photos="photos" :friendsphotos="friendsphotos"></logged-component>
 		</div>
 	</div>
-
 	<script src="js/init.js"></script>
 </body>
 

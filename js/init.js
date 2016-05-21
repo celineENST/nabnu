@@ -501,15 +501,20 @@ var loggedComponent = Vue.extend({
 		}
 	},
 	template: `
+		<div id="head" class="row">
+			<div class="col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3 col-lg-4 col-lg-offset-4" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+				<h4>{{(currentView == 'my-friends-feed-component') ? "My Feed" : (currentView == 'search-component') ? "Follow" : (currentView == 'upload-component') ? "Upload a new Photo" : (currentView == 'likes') ? "Likes" : "Last Uploads" }}</h4>
+			</div>
+		</div>
 		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos">
 		</component>
 		<div id="nav" class="row">
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="glyphicon glyphicon-home"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'search-component'}" @click="go('search-component')"><span class="glyphicon glyphicon-search"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'upload-component'}" @click="go('upload-component')"><span class="glyphicon glyphicon-camera"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'likes'}" @click="go('likes')"><span class="glyphicon glyphicon-heart"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'last-uploads-component'}" @click="go('last-uploads-component')"><span class="glyphicon glyphicon-user"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" @click="logOut()"><span class="glyphicon glyphicon-log-out"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="fa fa-home fa-fw"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'search-component'}" @click="go('search-component')"><span class="fa fa-users fa-fw"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'upload-component'}" @click="go('upload-component')"><span class="fa fa-camera-retro fa-fw"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'likes'}" @click="go('likes')"><span class="fa fa-heart fa-fw"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'last-uploads-component'}" @click="go('last-uploads-component')"><span class="fa fa-paw fa-fw"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" @click="logOut()"><span class="fa fa-sign-out fa-fw"></span></div>
 		</div>
 	`,
 	methods: {
