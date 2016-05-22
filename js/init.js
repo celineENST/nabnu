@@ -101,14 +101,16 @@ var currentUploadComponent = Vue.extend({
 	props: ["url"],
 	template: `
 		<div class="row row-hv-centered" id="current-upload">
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<h3>{{ upload }} </h3><br />
-				<div class="frame_polaroid">
-				<figure>
-					<img width="100%" v-bind:src="url"/>
-					<figcaption>{{ text }}</figcaption>
-				</figure>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
+				<h3> You just uploaded a photo ! </h3><br />
+
+				<div id="container">
+					<div class="photoFrame" style="display:block;">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + url + ')', display:block}">
+						</img>
+					</div>
 				</div>
+
 			</div>
 		</div>
 	`
@@ -229,10 +231,10 @@ var lastUploadsComponent = Vue.extend({
 	template: `
 		<div class="row row-hv-centered" id="last-uploads">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
-				<h3>Your last uploads:</h3> <br />
-				<ul class="no-margin-no-padding">
-					<li v-for="photo in photos" style="display: inline;">
-						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
+				<ul id="savedList">
+					<li v-for="photo in photos" class="photoFrame" style="display:inline-block;">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						</img>
 					</li>
 				</ul>
 			</div>
@@ -247,12 +249,12 @@ var myFriendsFeedComponent = Vue.extend({
 		<div class="row row-hv-centered" id="my-friends-feed">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
 				<h3>Friends Feed</h3> <br />
-				<div id="container">
-					<div v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
+				<ul id="container">
+					<li v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
 						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
 						</img>
-					</div>
-				</div>
+					</li>
+				</ul>
 			</div>
 		</div>
 	`,
@@ -260,9 +262,9 @@ var myFriendsFeedComponent = Vue.extend({
 		// Swipe a photo
 		swipe: function(){
 			fbi = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images');
-			console.log($(".swipingPicture"));
 			// Swiper Right: save the picture into my feed
 			$(".swipingPicture").on("swiperight",function(){
+				console.log("X");
 				$(this).addClass('rotate-left').delay(700).fadeOut(1);
   				$('.swipingPicture').find('.status').remove();
   				$(this).append('<div class="status save">Save in my feed!</div>'); 
@@ -325,10 +327,10 @@ var savedPhotosComponent = Vue.extend({
 	template: `
 		<div class="row row-hv-centered" id="savedPhotos">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
-				<h3>Saved Photos:</h3> <br />
-				<ul class="no-margin-no-padding">
-					<li v-for="photo in savedfriendsphotos" style="display: inline;">
-						<img v-bind:src="photo.filePayload" width="140" height="140" class="img-rounded">
+				<ul id="savedList">
+					<li v-for="photo in savedfriendsphotos" class="photoFrame">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						</img>
 					</li>
 				</ul>
 			</div>
@@ -598,18 +600,17 @@ var app = new Vue({
 
 // Fetching the user's feed. In the following steps, we'll be fetching the user's friends' feeds
 function fetchUserFeed() {
-	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(5));
+	app.$bindAsArray("photos",new Firebase( 'https://intense-fire-5524.firebaseio.com/pola/' + app.usr).limitToLast(10));
 }
 
 // Fetching the user's friends' feeds
 function fetchFriendFeed() {
-	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + "/images").limitToLast(5));
+	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + "/images").limitToLast(10));
 }
 
 // Fetching the user's likes
 function fetchSavedFriendFeed() {
 	// Fetching friends photos
-		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
 		// New folder: list 
 		fbl = new Firebase('https://intense-fire-5524.firebaseio.com/list/' + app.usr);
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
