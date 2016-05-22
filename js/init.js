@@ -293,7 +293,7 @@ var myFriendsFeedComponent = Vue.extend({
 var savedPhotosComponent = Vue.extend({
 	props: ["savedfriendsphotos"],
 	template: `
-		<div class="row row-hv-centered" id="saved-photos-component">
+		<div class="row row-hv-centered" id="savedPhotos">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
 				<h3>Saved Photos:</h3> <br />
 				<ul class="no-margin-no-padding">
@@ -311,30 +311,40 @@ var searchComponent = Vue.extend({
 	props: ['usr'],
 	template: `
 		<div class="row row-hv-centered" id="search" style="background-color:white;">
+			
 			<h3> Follow your friends </h3>
+			
 			<div class="center-content margin-bottom">
-				<input type="text" id="inputSearchUser" class="form-control" placeholder="search by email">
+				<input type="text" id="inputSearchUser" class="form-control" v-model='inputEmail' @keyup="searchUser()">
 			</div>
+			
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<button type="button" class="btn btn-default btn-info quicksand" id="upload" @click="searchUser()">
 					Search
 				</button>
-				<div id="searchResults" v-if="(searching==true && followDone!=true) || unfollowDone == true"> 
-					<h3>Results</h3> 
-					<p> {{inputEmail}} <button class="btn btn-default btn-info quicksand" @click="followUser()">Follow</button>
-				</div>
-				<div id="searchResults1" v-if="searching==true && followDone==true && unfollowDone!=true"> 
-					<h3>Results</h3> 
-					<p>{{inputEmail}} <button class="btn btn-primary" @click="unfollowUser()">Unfollow</button>
-				</div>
-				<div id="searchResults2" v-if="foundUser == false">
+
+				<div id="searchResults" v-if="(searching)">
 					<h3>Results</h3>
-					<p>{{searchErrorMsg}}
+					<p>
+						<span v-if='foundUser && endLoop'>
+							{{ inputEmail }} :
+							<span v-if="followDone">
+								<button class="btn btn-default btn-info quicksand" @click="followUser()">Unfollow</button>
+							</span>
+							<span v-else>
+								<button class="btn btn-default btn-success quicksand" @click="followUser()">Follow</button>
+							</span>
+						</span> 
+						<span v-if='!foundUser && endLoop'> {{ inputEmail }} : Check the email address. User not found or you enter your email.</span> 
+						<span v-if='!endLoop'><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only">Loading...</span></span>
+					</p>
 				</div>
+
 			</div>
+
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<div id="followResults"> 
-					<div>People you follow </div>
+					<h3>People you follow </h3>
 					<button class="btn btn-primary" @click="peopleYouFollow()">Following</button>
 				</div>
 				<ul>
@@ -360,128 +370,96 @@ var searchComponent = Vue.extend({
 		return {
 			follower: "",
 			following: "",
-			inputEmail: "",
-			searching: null,
+			inputEmail: "example@gmail.com",
+			searching: false,
 			followDone: "",
-			unfollowDone: "",
-			searchError:false,
-			searchErrorMsg:" ",
-			foundUser: null,
+			foundUser: false,
 			followingEmail: "",
 			followerEmail: "",
 			followers:[],
 			followings:[],
 			noFollowers:"",
-			noFollowersMsg:""
+			noFollowersMsg:"",
+			endLoop:false
 		}
 	},
 	methods:{
 		//Search a user by email
 		searchUser: function(){
 			var self = this;
-			self.searchError = false;
-			var email = $('#inputSearchUser').val();
-			var fb = ref;
-			if( email ){ 
-				loadRecord(email);  
+			self.searching = true;
+			if( self.inputEmail != null ){ 
+				self.loadRecord(self.inputEmail);  
 			}
 			else { 
-				alert('Write an email'); 
+				alert('Please write an email'); 
 			}
-
-			//Search for the email in the data under users
-			function loadRecord(email) {
- 				fb.child('users/').once('value', function (snap) {
- 					var k=snap.val();
- 					self.searching = null;
- 					self.searchErrorMsg = " ";
- 					self.searchError = false;
- 					self.foundUser = false;
- 					
- 					
- 					//search for the user with that email, If I found him I save id of follower, following
- 					//Check that the user doesnt enter his email
- 					Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-	 						if(k[element].email == email && element != self.usr ) {
-	 							self.follower = self.usr;
-	 							self.following = element;
-	 							self.inputEmail = k[element].email;
-	 							//check if you already follow that user(look for following userId unde the follower userId )
-			 					var f = new Firebase(ref + "follow/" + self.follower);
-			 					var followingCheck = self.following;
-			 					f.once("value", function(snapshot) {
-				 					var a = snapshot.child(followingCheck).exists();
-				 					//if there is a record
-				 					if (a == true) {
-				 						f.once("value", function(snapshot){
-				 							var data = snapshot.child(followingCheck + "/following").val();
-				 							//if the record=true(user follows him)
-				 							if(data == true){
-				 								self.followDone = true;
-				 								self.searching = true;
-				 								self.foundUser= true;
-				 								self.searchErrorMsg = " ";
-				 							} else{ //record = false (user doesnt follow him anymore)
-				 								self.followDone = false;
-				 								self.searching = true;
-				 								self.foundUser= true;
-				 								self.searchErrorMsg = " ";
-				 							}
-				 						});
-				 					} else {
-				 						self.followDone = false;
-				 						self.searching = true;
-				 						self.foundUser= true;
-				 						self.searchErrorMsg = " ";
-				 					}
-				 				});
-	 						}
-
- 					});
- 					if(self.foundUser == false ){
- 						self.searchErrorMsg = "Check the email address. User not found or you enter your email.";
- 					}
- 					
- 				});
-			};
+		},
+		//Search for the email in the data under users
+		loadRecord: function(email) {
+			var self = this;
+			self.endLoop= false;
+			self.foundUser = false;
+			ref.child('users/').once('value', function (snap) {
+				var users =snap.val();
+				var item = 0;
+				//search for the user with that email, If I found him I save id of follower, following
+				//Check that the user doesnt enter his email
+				Object.getOwnPropertyNames(users).forEach(function(element,index,array) {
+					if (users[element].email == email && element != self.usr) {
+						console.log("found");
+						self.foundUser = true;
+						self.follower = self.usr;
+						self.following = element;
+						// Check if you already follow that user (look for following userId unde the follower userId)
+						new Firebase(ref + "follow/" + self.follower).once("value",function(snapshot) {
+							if (snapshot.child(self.following).exists()) { // if there is a record
+								self.followDone = true;
+			 					self.searching = true;
+			 					self.endLoop = true;
+			 					console.log("following");
+							} else { //record = false (user doesnt follow him anymore)
+				 				self.followDone = false;
+				 				self.searching = true;
+				 				self.endLoop = true;
+				 				console.log("not following")
+				 			}
+						});
+					} else {
+						if (item == array.length -1 && !self.foundUser)
+							{
+								self.endLoop = true;
+							}
+						item++
+					}
+				});
+			});
 		},
 		// Follow a user
 		followUser: function(){
 			var self = this;
-			var fb = ref;
-			var test=false;
-			self.followDone = true;
-			$('#searchResults').text('');
-			fb.child('/follow').once('value', function (snap) {
-				var k=snap.val();
-				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-					if(element == self.follower){
-					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following + "/following").set(true);
-					 	var test = true;
-					 	self.unfollowDone = false;
+			if (self.followDone) { // Unfollow
+				self.endLoop = false;
+				ref.child('/follow/' + self.follower + '/' + self.following + "/following").set(false,function(error) {
+					if (error) {
+						alert("Couldn't unfollow");
+					} else {
+						self.followDone = false;
 					}
-				})
-			},function() {
-				if(test==false){
-					alert("Couldn't follow user");				 						
-				}
-			});
-		},
-		// Unfollow a user
-		unfollowUser: function(){
-			var self = this;
-			var fb = ref;
-			fb.child('/follow/' + self.follower + '/').once('value', function (snap) {
-				var k=snap.val();
-				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-					
-					if(element == self.following){
-					 	var f = new Firebase(ref + "follow/" + self.follower + "/" + self.following + "/following").set(false);
-					 	self.unfollowDone = true;
+					self.endLoop = true;
+				});
+				// After the data structure change, just delete the existing node instead of setting following to false
+			} else { // Follow
+				self.endLoop = false;
+				ref.child('/follow' + self.follower + '/' + self.following + '/following').set(true,function(error) {
+					if (error) {
+						alert("Couldn't follow user");
+					} else {
+						self.followDone = true;
 					}
-				})
-				
-			});
+					self.endLoop = true;
+				});
+			}
 		},
 		peopleYouFollow: function(){
 			self = this;
@@ -508,7 +486,7 @@ var searchComponent = Vue.extend({
 			});
 		},
 		peopleFollowYou: function(){
-			var followers = [ ];
+			var followers = [];
 			self = this;
 			var fb = ref;
 			self.noFollowers = true;
@@ -553,7 +531,7 @@ var loggedComponent = Vue.extend({
 	props: ['usr','photos','friendsphotos','savedfriendsphotos'],
 	data: function() {
 		return {
-			currentView: 'upload-component',
+			currentView: 'search-component',
 			url: ""
 		}
 	},
@@ -635,7 +613,7 @@ function fetchFriendFeed() {
 }
 
 // Fetching the user's likes
-function fetchSavedFriendFeed(){
+function fetchSavedFriendFeed() {
 	// Fetching friends photos
 		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');

@@ -96,7 +96,7 @@
     flex-direction: column;
   }
 
-  #last-uploads, #current-upload, #my-friends-feed, #search, #upload-form {
+  #last-uploads, #current-upload, #my-friends-feed, #search, #upload-form, #savedPhotos {
       height: 86vh !important;
       background-color: #F1EFE6;
   }
