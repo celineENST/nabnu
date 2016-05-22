@@ -622,8 +622,10 @@ function fetchSavedFriendFeed() {
 		sd_dislikes = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes');
 
 		// Look for who follows the app.usr
-		fbl.once('value', function (snap) {
+		fbl.on('value', function (snap) {
 	 		var k=snap.val();
+	 		console.log(k);
+	 		if(k){
 	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
 	 			// 'element' is every id-user that app.usr may follow
 	 			//if(k[element].following == true){ // check if the following is effective
@@ -666,6 +668,7 @@ function fetchSavedFriendFeed() {
 	 				});
 	 			//}
 	 		});
+ }
 		});
  	app.$bindAsArray("savedfriendsphotos", sd_likes);
 }
