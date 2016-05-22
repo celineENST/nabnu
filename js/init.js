@@ -248,7 +248,6 @@ var myFriendsFeedComponent = Vue.extend({
 	template: `		
 		<div class="row row-hv-centered" id="my-friends-feed">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
-				<h3>Friends Feed</h3> <br />
 				<ul id="container">
 					<li v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
 						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
@@ -532,8 +531,8 @@ var loggedComponent = Vue.extend({
 	},
 	template: `
 		<div id="head" class="row">
-			<div class="col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3 col-lg-4 col-lg-offset-4" style="display: flex; align-items: center; justify-content: center; height: 100%;">
-				<h4>{{(currentView == 'my-friends-feed-component') ? "My Feed" : (currentView == 'search-component') ? "Follow" : (currentView == 'upload-component') ? "Upload a new Photo" : (currentView == 'saved-photos-component') ? "Likes" : "Last Uploads" }}</h4>
+			<div class="col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3 col-lg-4 col-lg-offset-4" id="title-bar">
+				<h4>{{(currentView == 'my-friends-feed-component') ? "Home" : (currentView == 'search-component') ? "Users" : (currentView == 'upload-component') ? "New" : (currentView == 'saved-photos-component') ? "Likes" : "Your uploads" }}</h4>
 			</div>
 		</div>
 		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos" :followinglist="followinglist" :followerslist="followerslist">

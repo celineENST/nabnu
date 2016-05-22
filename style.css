@@ -81,6 +81,18 @@
     border-image-repeat: round !important;
   }
 
+  #title-bar {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100%;
+  }
+
+  #title-bar h4 {
+    text-transform: uppercase !important;
+    letter-spacing: 3px !important;
+  }
+
 /*** AUTHENTICATION ROW ***/
  
   #sign-up {
@@ -99,6 +111,14 @@
   #last-uploads, #current-upload, #my-friends-feed, #search, #upload-form, #savedPhotos {
       height: 86vh !important;
       background-color: #F1EFE6;
+  }
+
+  #my-friends-feed, #savedPhotos, #last-uploads {
+    background: -webkit-linear-gradient(top, #DDFFCC, #B3ECEF 20%, #9AE4E8 60%);
+    background: -moz-linear-gradient(top, #DDFFCC, #B3ECEF 20%, #9AE4E8 60%);
+    background: -o-linear-gradient(top, #DDFFCC, #B3ECEF 20%, #9AE4E8 60%);
+    background: -ms-linear-gradient(top, #DDFFCC, #B3ECEF 20%, #9AE4E8 60%);
+    background: linear-gradient(top, #DDFFCC, #B3ECEF 20%, #9AE4E8 60%);
   }
 
 /**** HEADBAND ***/
