@@ -259,8 +259,8 @@ var myFriendsFeedComponent = Vue.extend({
 	methods: {
 		// Swipe a photo
 		swipe: function(){
-			fbi = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
-
+			fbi = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images');
+			console.log($(".swipingPicture"));
 			// Swiper Right: save the picture into my feed
 			$(".swipingPicture").on("swiperight",function(){
 				$(this).addClass('rotate-left').delay(700).fadeOut(1);
@@ -275,11 +275,11 @@ var myFriendsFeedComponent = Vue.extend({
 						Object.keys(k).forEach(function(element, index, array){
 							if(k[element].filePayload == url_image){ 
 								// Add the photo to the folder /likes
-								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes/' + element);
+								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/likes/' + element);
 								fbil.update(k[element]);
 								console.log("Photo added");
 								// Remove the photo from the folder /images
-								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images/' + element);
+								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
 								fbii.remove();
 							}
 						});
@@ -303,11 +303,11 @@ var myFriendsFeedComponent = Vue.extend({
 						Object.keys(k).forEach(function(element, index, array){
 							if(k[element].filePayload == url_image){ 
 								// Add the photo to the folder /dislikes
-								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/dislikes/' + element);
+								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes/' + element);
 								fbil.update(k[element]);
 								console.log("Photo removed");
 								// Remove the photo from the folder /images
-								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images/' + element);
+								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
 								fbii.remove();
 							}
 						});
@@ -640,7 +640,7 @@ function fetchUserFeed() {
 
 // Fetching the user's friends' feeds
 function fetchFriendFeed() {
-	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + "/images").limitToLast(5));
+	app.$bindAsArray("friendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + "/images").limitToLast(5));
 }
 
 // Fetching the user's likes
@@ -648,9 +648,10 @@ function fetchSavedFriendFeed() {
 	// Fetching friends photos
 		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
-		nf = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/images');
-		likes = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes');
-		dislikes = new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/dislikes');
+		// New folder in Firebase: savedData
+		sd_images = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images');
+		sd_likes = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/likes');
+		sd_dislikes = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes');
 
 		// Look for who follows the app.usr
 		fb.child(app.usr).once('value', function (snap) {
@@ -667,7 +668,7 @@ function fetchSavedFriendFeed() {
 	 					Object.getOwnPropertyNames(kf).forEach(function(elementf) {
 	 						// 'elementf' is the id of each photo
 	 						// LIKES folder
-	 						likes.once('value', function (snapl){
+	 						sd_likes.once('value', function (snapl){
 	 							var kl = snapl.val();
 	 							if(kl){
 	 								Object.keys(kl).forEach(function(elementl) {
@@ -679,7 +680,7 @@ function fetchSavedFriendFeed() {
 	 							
 	 						});
 	 						// DISLIKES folder
-	 						dislikes.once('value', function(snapd) {
+	 						sd_dislikes.once('value', function(snapd) {
 	 							var kd = snapd.val();
 	 							if(kd){
 	 								Object.keys(kd).forEach(function(elementd) {
@@ -691,14 +692,14 @@ function fetchSavedFriendFeed() {
 	 						});	 							
 	 					});
 	 					if(!already){
-							nf.update(kf);
+							sd_images.update(kf);
 							console.log("Image added");
 						}
 	 				});
 	 			}
 	 		});
 		});
-	app.$bindAsArray("savedfriendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes'));
+	app.$bindAsArray("savedfriendsphotos", sd_likes);
 }
 
 // Callback checking if we have authentified. Authentication persists 24H by default
