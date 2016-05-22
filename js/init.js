@@ -1,6 +1,6 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
-
-// Hide the loading message
+ 
+ // Hide the loading message
 $.mobile.loading().hide();
 
 /******* AUTHENTICATION COMPONENT *******/
@@ -37,7 +37,6 @@ var authComponent = Vue.extend({
 		// Login User
 		login: function() {
 			var self = this;
-			console.log(self);
 			ref.authWithPassword({
 				email    : self.email,
 				password : self.pwd
@@ -118,7 +117,7 @@ var currentUploadComponent = Vue.extend({
 
 /******* UPLOAD COMPONENT *******/
 var uploadComponent = Vue.extend({
-	props: ["usr","currentView","url"],
+	props: ["usr","currentView","url","spinner"],
 	template: `
 		<div class="row row-hv-centered" id="upload-form">
 			<div class="center-content margin-bottom">
@@ -130,6 +129,7 @@ var uploadComponent = Vue.extend({
 					Upload my photo
 				</button>
 			</div>
+			<div id="loadSpin"></spin>
 		</div>
 	`,
 	data: function() {
@@ -140,6 +140,32 @@ var uploadComponent = Vue.extend({
 	methods: {
 		// Upload Photo
 		uploadPhoto: function() {
+			//spinner
+			var opts = {
+			  lines: 13 // The number of lines to draw
+			, length: 10 // The length of each line
+			, width: 6 // The line thickness
+			, radius: 30 // The radius of the inner circle
+			, scale: 1 // Scales overall size of the spinner
+			, corners: 1 // Corner roundness (0..1)
+			, color: '#000' // #rgb or #rrggbb or array of colors
+			, opacity: 0.25 // Opacity of the lines
+			, rotate: 0 // The rotation offset
+			, direction: 1 // 1: clockwise, -1: counterclockwise
+			, speed: 1 // Rounds per second
+			, trail: 60 // Afterglow percentage
+			, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+			, zIndex: 2e9 // The z-index (defaults to 2000000000)
+			, className: 'spinner' // The CSS class to assign to the spinner
+			, top: '65%' // Top position relative to parent
+			, left: '50%' // Left position relative to parent
+			, shadow: false // Whether to render a shadow
+			, hwaccel: false // Whether to use hardware acceleration
+			, position: 'absolute' // Element positioning
+			}
+			var target = document.getElementById('loadSpin')
+			spinner = new Spinner(opts).spin(target);
+
 			var self = this;
 			var now = new Date();
 			var t = now.getFullYear() + "" + (now.getMonth()+1) + "" + now.getDate(); // YYYYMMDD
@@ -153,7 +179,9 @@ var uploadComponent = Vue.extend({
 				if (!empty || key[Object.keys(key)].timestamp != t) {
 					self.readImage(self,t);
 				} else {
+					spinner.stop();
 					alert("You have already uploaded a photo today! \nSee you tomorrow for new adventures!");
+
 				}
 			});
 		},
@@ -163,6 +191,7 @@ var uploadComponent = Vue.extend({
 			var file = $("#inputPhoto")[0].files[0]; // Fetching the chosen photo
 			var fileType = /image.*/
 			if ($('#inputPhoto').val()==''){ // If no image has been selected
+				spinner.stop();
 				alert("Select a photo!");
 			} else if (file.type.match(fileType)) { // Else we read the file and create a 64bits version
 				var reader = new FileReader();
@@ -173,6 +202,7 @@ var uploadComponent = Vue.extend({
 				}
 				reader.readAsDataURL(file); 
 			} else {
+				spinner.stop();
 				alert("File not supported !");
 			}
 		},
@@ -183,6 +213,7 @@ var uploadComponent = Vue.extend({
 				filePayload: source,
 				caption: $('#inputPhotoName').val()
 			},function() { // Callback showing the uploaded photo and clearing the fields
+				spinner.stop();
 				context.url = source;
 				context.upload = "uploaded";
 				$('#inputPhoto').val('');
@@ -310,8 +341,7 @@ var savedPhotosComponent = Vue.extend({
 var searchComponent = Vue.extend({
 	props: ['usr'],
 	template: `
-		<div class="row row-hv-centered" id="search" style="background-color:white;">
-			
+		<div class="row row-hv-centered" id="search">
 			<h3> Follow your friends </h3>
 			
 			<div class="center-content margin-bottom">
@@ -342,9 +372,9 @@ var searchComponent = Vue.extend({
 
 			</div>
 
+			<h5> Click to see people you follow and your followers </h5>
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<div id="followResults"> 
-					<h3>People you follow </h3>
 					<button class="btn btn-primary" @click="peopleYouFollow()">Following</button>
 				</div>
 				<ul>
@@ -353,6 +383,7 @@ var searchComponent = Vue.extend({
 					</li>
 				</ul>
 			</div>
+			<div v-if="noFollowings==true">{{noFollowingsMsg}}</div>
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
 				<div id="followResults"> 
 					<button class="btn btn-primary" @click="peopleFollowYou()">Followers</button>
@@ -364,6 +395,7 @@ var searchComponent = Vue.extend({
 				</ul>
 			</div>
 			<div v-if="noFollowers==true">{{noFollowersMsg}}</div>
+			</div>
 		</div>
 	`,
 	data: function(){
@@ -380,7 +412,9 @@ var searchComponent = Vue.extend({
 			followings:[],
 			noFollowers:"",
 			noFollowersMsg:"",
-			endLoop:false
+			endLoop:false,
+			noFollowings:"",
+			noFollowingsMsg:""
 		}
 	},
 	methods:{
@@ -464,15 +498,14 @@ var searchComponent = Vue.extend({
 		peopleYouFollow: function(){
 			self = this;
 			var followings = [];
-			followings.length = 0;
 			var fb = ref;
-			fb.child('/follow/' + app.usr + '/').once('value', function (snap) {
+			fb.child('/follow/' + app.usr + '/').on('value', function (snap) {
 				var k=snap.val();
 				Object.getOwnPropertyNames(k).forEach(function(element,index,array){
 					if(k[element].following == true){
 						var tempId = element;
 						fb2 = ref;
-						fb2.child('/users').once('value',function(snap){
+						fb2.child('/users').on('value',function(snap){
 							var j=snap.val();
 							Object.getOwnPropertyNames(j).forEach(function(element,index,array){
 								if(element == tempId ){
@@ -531,7 +564,7 @@ var loggedComponent = Vue.extend({
 	props: ['usr','photos','friendsphotos','savedfriendsphotos'],
 	data: function() {
 		return {
-			currentView: 'search-component',
+			currentView: 'upload-component',
 			url: ""
 		}
 	},
@@ -576,7 +609,8 @@ var app = new Vue({
 	data: {
 		// Authentication data
 		logged: false,
-		usr: ""
+		usr: "",
+		spinner:""
 	}, 
 	firebase : {
 	},
