@@ -66,7 +66,6 @@ var authComponent = Vue.extend({
 					var f = new Firebase(ref + "users/" + userData.uid).set({
 							email: self.email
 					});
-					var f2 = new Firebase(ref + "follow/" + userData.uid + "/" + userData.uid + "/following").set(false);
 					self.login();
 				}
 			});
@@ -345,7 +344,7 @@ var searchComponent = Vue.extend({
 			<h3> Follow your friends </h3>
 			
 			<div class="center-content margin-bottom">
-				<input type="text" id="inputSearchUser" class="form-control" v-model='inputEmail' @keyup="searchUser()">
+				<input type="text" id="inputSearchUser" class="form-control" @keyup.enter="searchUser()" placeholder="example@gmail.com">
 			</div>
 			
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
@@ -402,7 +401,7 @@ var searchComponent = Vue.extend({
 		return {
 			follower: "",
 			following: "",
-			inputEmail: "example@gmail.com",
+			inputEmail: "",
 			searching: false,
 			followDone: "",
 			foundUser: false,
@@ -422,6 +421,7 @@ var searchComponent = Vue.extend({
 		searchUser: function(){
 			var self = this;
 			self.searching = true;
+			self.inputEmail = $('#inputSearchUser').val();
 			if( self.inputEmail != null ){ 
 				self.loadRecord(self.inputEmail);  
 			}
@@ -443,10 +443,9 @@ var searchComponent = Vue.extend({
 					if (users[element].email == email && element != self.usr) {
 						console.log("found");
 						self.foundUser = true;
-						self.follower = self.usr;
 						self.following = element;
 						// Check if you already follow that user (look for following userId unde the follower userId)
-						new Firebase(ref + "follow/" + self.follower).once("value",function(snapshot) {
+						new Firebase(ref + "follow/" + self.usr).once("value",function(snapshot) {
 							if (snapshot.child(self.following).exists()) { // if there is a record
 								self.followDone = true;
 			 					self.searching = true;
@@ -474,7 +473,7 @@ var searchComponent = Vue.extend({
 			var self = this;
 			if (self.followDone) { // Unfollow
 				self.endLoop = false;
-				ref.child('/follow/' + self.follower + '/' + self.following + "/following").set(false,function(error) {
+				ref.child('/follow/' + self.usr + '/' + self.following).remove(function(error) {
 					if (error) {
 						alert("Couldn't unfollow");
 					} else {
@@ -482,10 +481,9 @@ var searchComponent = Vue.extend({
 					}
 					self.endLoop = true;
 				});
-				// After the data structure change, just delete the existing node instead of setting following to false
 			} else { // Follow
 				self.endLoop = false;
-				ref.child('/follow' + self.follower + '/' + self.following + '/following').set(true,function(error) {
+				ref.child('/follow/' + self.usr + '/' + self.following + '/following').set(true,function(error) {
 					if (error) {
 						alert("Couldn't follow user");
 					} else {
@@ -647,7 +645,7 @@ function fetchFriendFeed() {
 }
 
 // Fetching the user's likes
-function fetchSavedFriendFeed() {
+function fetchSavedFriendFeed() {/*
 	// Fetching friends photos
 		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
@@ -702,7 +700,7 @@ function fetchSavedFriendFeed() {
 	 		});
 		});
 	app.$bindAsArray("savedfriendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes'));
-}
+*/}
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
