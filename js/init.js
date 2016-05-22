@@ -610,6 +610,8 @@ function fetchFriendFeed() {
 function fetchSavedFriendFeed() {
 	// Fetching friends photos
 		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
+		// New folder: list 
+		fbl = new Firebase('https://intense-fire-5524.firebaseio.com/list/' + app.usr);
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
 		// New folder in Firebase: savedData
 		sd_images = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images');
@@ -617,11 +619,11 @@ function fetchSavedFriendFeed() {
 		sd_dislikes = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes');
 
 		// Look for who follows the app.usr
-		fb.child(app.usr).once('value', function (snap) {
+		fbl.once('value', function (snap) {
 	 		var k=snap.val();
 	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
 	 			// 'element' is every id-user that app.usr may follow
-	 			if(k[element].following == true){ // check if the following is effective
+	 			//if(k[element].following == true){ // check if the following is effective
 	 				// Fetch the photos from the followed user
 	 				fbf.child(element).once('value', function (snapf) {
 	 					var kf = snapf.val();
@@ -659,7 +661,7 @@ function fetchSavedFriendFeed() {
 							console.log("Image added");
 						}
 	 				});
-	 			}
+	 			//}
 	 		});
 		});
  	app.$bindAsArray("savedfriendsphotos", sd_likes);
