@@ -399,7 +399,6 @@ var searchComponent = Vue.extend({
 	`,
 	data: function(){
 		return {
-			follower: "",
 			following: "",
 			inputEmail: "",
 			searching: false,
@@ -645,7 +644,7 @@ function fetchFriendFeed() {
 }
 
 // Fetching the user's likes
-function fetchSavedFriendFeed() {/*
+function fetchSavedFriendFeed() {
 	// Fetching friends photos
 		fb = new Firebase( 'https://intense-fire-5524.firebaseio.com/follow/');
 		fbf = new Firebase('https://intense-fire-5524.firebaseio.com/pola/');
@@ -700,7 +699,7 @@ function fetchSavedFriendFeed() {/*
 	 		});
 		});
 	app.$bindAsArray("savedfriendsphotos",new Firebase('https://intense-fire-5524.firebaseio.com/follow/' + app.usr + '/likes'));
-*/}
+}
 
 // Callback checking if we have authentified. Authentication persists 24H by default
 function authDataCallback(authData) {
