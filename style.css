@@ -131,36 +131,52 @@
     border-bottom: 5px solid #A6E500;
   }
 
-/*** POLAROID FRAME ***/
-  
-  .frame_polaroid figure{
-  	padding: 6px 6px 2px 6px;
-  	background: #eee6d8;
-  	background: -webkit-linear-gradient(top, #5fdadc, #71e0e1 20%, #89e8e9 60%);
-  	background: -moz-linear-gradient(top, #5fdadc, #71e0e1 20%, #89e8e9 60%);
-  	background: -o-linear-gradient(top, #5fdadc, #71e0e1 20%, #89e8e9 60%);
-  	background: -ms-linear-gradient(top, #5fdadc, #71e0e1 20%, #89e8e9 60%);
-  	background: linear-gradient(top, #5fdadc, #71e0e1 20%, #89e8e9 60%);
-  	/* Shadow */
-  	-webkit-box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
-  	-moz-box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
-  	box-shadow: 4px 4px 8px -4px rgba(0, 0, 0, .75);
-  }
-
-  .frame_polaroid {
-  	/*setting a width and adding overflow:hidden will clear the floats we're going to apply to figure*/
-  	width:20%;
-  	overflow:hidden;
-  	transform: translateX(200%);
-  }
-
 /*** FRIENDS FEED ***/
 
-  #container {
+  /* Rotating the polas */
+
+    #container li, #savedList li {
+      -webkit-transform: rotate(-2deg);
+      -moz-transform: rotate(-2deg);
+    }
+    #container li:nth-child(even), #savedList li:nth-child(even) {
+      -webkit-transform: rotate(2deg);
+      -moz-transform: rotate(2deg);
+    }
+     
+    #container li:nth-child(3n), #savedList li:nth-child(3n) {
+      -webkit-transform: none;
+      -moz-transform: none;
+      transform: translateY(-5px,0);
+    }
+     
+    #container li:nth-child(5n),#savedList li:nth-child(5n) {
+      -webkit-transform: rotate(-5deg);
+      -moz-transform: rotate(-5deg);
+      transform: translateX(0, 5px);
+    }
+
+
+  #savedList { /* For the boards - in saved photos and uploaded photos*/
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 100vw !important;
+    height: 100%;
+    overflow: scroll;
+  }
+
+  #container { /* For the feed, stacked */
+    padding: 0 !important;
+    margin: 0 !important;
     display: block;
     position: relative;
-    width:160px;
-    height: 160px;
+    width:222px;
+    height: 270px;
     list-style-type: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -170,24 +186,30 @@
     user-select: none;
   }
 
-  .swipingPicture {
+  .swipingPicture,.photoFrame {
+    list-style-type: none;
     background: #FFFFFF;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    padding: 10px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
     color: #A6E500;
-    padding: 20px;
-    width: 160px;
-    height: 160px;
+    width: 222px;
+    height: 270px;
     position: absolute;
     cursor: hand;
   }
 
+  .photoFrame {
+    position: relative !important;
+    margin-left: 5vw !important;
+    cursor: default !important;
+  }
+
   .polaroid {
-    background: #222;
-    width: 120px;
-    height: 120px;
+    background: #FFFFFF;
+    width: 200px;
+    height: 200px;
     display: block;
-    background-size: 100% auto !important;
+    background-size: cover !important;
     background-position: center;
     background-repeat: no-repeat;
   }
