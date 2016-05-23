@@ -121,6 +121,7 @@ var uploadComponent = Vue.extend({
 	props: ["usr","currentView","url","spinner"],
 	template: `
 		<div class="row row-hv-centered" id="upload-form">
+			<h2><i class="fa fa-cloud-upload"></i></h2>
 			<div class="center-content margin-bottom">
 				<input type="file" accept="image/*" capture="camera" id="inputPhoto" class="form-control">
 				<input type="text" id="inputPhotoName" class="form-control" style="margin-top:2px;" placeholder="Name my photo">
@@ -344,8 +345,6 @@ var searchComponent = Vue.extend({
 	props: ['usr','followinglist', 'followerslist'],
 	template: `
 		<div class="row row-hv-centered" id="search">
-			<h3> Follow your friends </h3>
-			
 			<div class="center-content margin-bottom">
 				<input type="text" id="inputSearchUser" class="form-control" @keyup.enter="searchUser()" placeholder="example@gmail.com">
 			</div>
@@ -374,17 +373,17 @@ var searchComponent = Vue.extend({
 
 			</div>
 
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<h5>People you already follow</h5>
-				<ul>
-				<li v-for="people in followinglist">{{people[".value"]}}</li>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content" style="margin-top: 5vh;">
+				<h3>People you already follow</h3>
+				<ul class="no-margin-no-padding f-ul">
+					<li class="f-list" v-for="people in followinglist">{{people[".value"]}}</li>
 				</ul>
 			</div>
 
-			<div class="col-md-12 col-xs-12 col-lg-12 center-content">
-				<h5>Followers</h5>
-				<ul>
-				<li v-for="people in followerslist">{{people[".value"]}}</li>
+			<div class="col-md-12 col-xs-12 col-lg-12 center-content" style="margin-top: 5vh;">
+				<h3>Followers</h3>
+				<ul class="no-margin-no-padding f-ul">
+					<li class="f-list" v-for="people in followerslist">{{people[".value"]}}</li>
 				</ul>
 			</div>
 
@@ -534,7 +533,7 @@ var loggedComponent = Vue.extend({
 	template: `
 		<div id="head" class="row">
 			<div class="col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3 col-lg-4 col-lg-offset-4" id="title-bar">
-				<h4>{{(currentView == 'my-friends-feed-component') ? "Home" : (currentView == 'search-component') ? "Users" : (currentView == 'upload-component') ? "New" : (currentView == 'saved-photos-component') ? "Likes" : "Your uploads" }}</h4>
+				<h4>{{(currentView == 'my-friends-feed-component') ? "Home" : (currentView == 'search-component') ? "Users" : (currentView == 'upload-component') ? "New" : (currentView == 'saved-photos-component') ? "Likes" : "Uploads" }}</h4>
 			</div>
 		</div>
 		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos" :followinglist="followinglist" :followerslist="followerslist">
