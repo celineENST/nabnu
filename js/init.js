@@ -332,6 +332,7 @@ var savedPhotosComponent = Vue.extend({
 				<ul id="savedList">
 					<li v-for="photo in savedfriendsphotos" class="photoFrame">
 						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						{{photo.caption}}
 						</img>
 					</li>
 				</ul>
