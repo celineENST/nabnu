@@ -1,5 +1,5 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
- 
+
  // Hide the loading message
 $.mobile.loading().hide();
 
@@ -98,15 +98,21 @@ var authComponent = Vue.extend({
 
 /******* CURRENTUPLOAD COMPONENT *******/
 var currentUploadComponent = Vue.extend({
-	props: ["url"],
+	props: ["url","caption"],
+	methods: {
+		cap: function() {
+			$('#inputPhotoName').val("");
+			return this.caption;
+		}
+	},
 	template: `
 		<div class="row row-hv-centered" id="current-upload">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
-				<h3> You just uploaded a photo ! </h3><br />
-
+				<h3>You just uploaded a picture !</h3>
 				<div id="container">
-					<div class="photoFrame" style="display:block;">
+					<div class="photoFrame" style="display:block; margin: 0 !important;">
 						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + url + ')', display:block}">
+							{{ cap() }}
 						</img>
 					</div>
 				</div>
@@ -118,7 +124,7 @@ var currentUploadComponent = Vue.extend({
 
 /******* UPLOAD COMPONENT *******/
 var uploadComponent = Vue.extend({
-	props: ["usr","currentView","url","spinner"],
+	props: ["usr","currentView","url","spinner","caption"],
 	template: `
 		<div class="row row-hv-centered" id="upload-form">
 			<h2><i class="fa fa-cloud-upload"></i></h2>
@@ -136,7 +142,7 @@ var uploadComponent = Vue.extend({
 	`,
 	data: function() {
 		return {
-			upload: "please upload a file"
+			upload: "please upload a file",
 		}
 	},
 	methods: {
@@ -210,17 +216,16 @@ var uploadComponent = Vue.extend({
 		},
 		// Upload to Firebase
 		uploadToFirebase : function(context,t,source) {
+			context.caption = $('#inputPhotoName').val();
 			var f = new Firebase(ref + "pola/" + context.usr).push({
 				timestamp: t,
 				filePayload: source,
-				caption: $('#inputPhotoName').val()
+				caption: context.caption
 			},function() { // Callback showing the uploaded photo and clearing the fields
 				spinner.stop();
 				context.url = source;
 				context.upload = "uploaded";
-				$('#inputPhoto').val('');
-				$('#inputPhotoName').val('');
-				context.currentView = 'current-upload'
+				context.currentView = 'current-upload';
 			});
 		}
 	}
@@ -326,12 +331,33 @@ var myFriendsFeedComponent = Vue.extend({
 /******* LIKES SAVED PHOTOS COMPONENT *******/
 var savedPhotosComponent = Vue.extend({
 	props: ["savedfriendsphotos"],
+	methods: {
+		parse : function(uid,imgid) {
+			var link = 'https://intense-fire-5524.firebaseio.com/pola/' + uid + '/'  + imgid + '/filePayload.json';
+			// Parsing JSON form URL
+			$.ajax({
+	            type: 'GET',
+	            url: link,
+	            async: true,
+	            contentType: "application/json",
+	            dataType: 'json',
+	            success: function (json) {
+	            	// Print to image after we've parsed
+	            	$("#" + imgid).attr("style","background-image: url(" + json + "); display: block;");
+	            }, error: function (e) {
+	                console.log("error loading saved picture" + imgid);
+	           	}
+        	});
+        	// While we wait for the parsing, display a loading icon
+        	return "resources/wait.png";
+    	}
+	},
 	template: `
 		<div class="row row-hv-centered" id="savedPhotos">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
 				<ul id="savedList">
 					<li v-for="photo in savedfriendsphotos" class="photoFrame">
-						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						<img class="polaroid" id ="{{photo['img_id']}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo['user_id'],photo['img_id'])  + ')', display:block}">
 						{{photo.caption}}
 						</img>
 					</li>
@@ -528,7 +554,8 @@ var loggedComponent = Vue.extend({
 	data: function() {
 		return {
 			currentView: 'upload-component',
-			url: ""
+			url: "",
+			caption: ""
 		}
 	},
 	template: `
@@ -537,7 +564,7 @@ var loggedComponent = Vue.extend({
 				<h4>{{(currentView == 'my-friends-feed-component') ? "Home" : (currentView == 'search-component') ? "Users" : (currentView == 'upload-component') ? "New" : (currentView == 'saved-photos-component') ? "Likes" : "Uploads" }}</h4>
 			</div>
 		</div>
-		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos" :followinglist="followinglist" :followerslist="followerslist">
+		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos" :followinglist="followinglist" :followerslist="followerslist" :caption.sync="caption">
 		</component>
 		<div id="nav" class="row">
 			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="fa fa-home fa-fw"></span></div>
@@ -629,7 +656,7 @@ function fetchSavedFriendFeed() {
 	 			// 'element' is every id-user that app.usr may follow
 	 			//if(k[element].following == true){ // check if the following is effective
 	 				// Fetch the photos from the followed user
-	 				fbf.child(element).once('value', function (snapf) {
+	 				fbf.child(element).on('value', function (snapf) {
 	 					var kf = snapf.val();
 	 					var already = false;
 
@@ -642,7 +669,7 @@ function fetchSavedFriendFeed() {
 	 							if(kl){
 	 								Object.keys(kl).forEach(function(elementl) {
 		 								if(elementl == elementf){
-		 									already = true; 	
+		 									already = true; 
 		 								}
 		 							});
 	 							}

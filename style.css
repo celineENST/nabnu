@@ -206,7 +206,7 @@
     }
 
 
-  #savedList { /* For the boards - in saved photos and uploaded photos*/
+  #savedList,#last-up { /* For the boards - in saved photos and uploaded photos*/
     padding: 0 !important;
     margin: 0 !important;
     display: flex;
