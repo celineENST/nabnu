@@ -257,7 +257,7 @@ var myFriendsFeedComponent = Vue.extend({
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
 				<ul id="container">
 					<li v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
-						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						<img class="polaroid" id ="{{photo.img_id}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')', display:block}">
 						{{photo.caption}}
 						</img>
 					</li>
@@ -266,36 +266,74 @@ var myFriendsFeedComponent = Vue.extend({
 		</div>
 	`,
 	methods: {
+		parse : function(uid,imgid) {
+			var link = 'https://intense-fire-5524.firebaseio.com/pola/' + uid + '/'  + imgid + '/filePayload.json';
+			// Parsing JSON form URL
+			$.ajax({
+	            type: 'GET',
+	            url: link,
+	            async: true,
+	            contentType: "application/json",
+	            dataType: 'json',
+	            success: function (json) {
+	            	// Print to image after we've parsed
+	            	$("#" + imgid).attr("style","background-image: url(" + json + "); display: block;");
+	            }, error: function (e) {
+	                console.log("error loading saved picture" + imgid);
+	           	}
+        	});
+        	// While we wait for the parsing, display a loading icon
+        	return "resources/wait.png";
+    	},
 		// Swipe a photo
 		swipe: function(){
 			fbi = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images');
 			// Swiper Right: save the picture into my feed
 			$(".swipingPicture").on("swiperight",function(){
-				console.log("X");
 				$(this).addClass('rotate-left').delay(700).fadeOut(1);
   				$('.swipingPicture').find('.status').remove();
   				$(this).append('<div class="status save">Save in my feed!</div>'); 
 
 				if($(this).find("div").attr("class") == "status save"){
-					var url_image = ($(this).find("img").attr("style").split("url(")[1]).split(");")[0];
+					var id_image_saved = $(this).find("img").attr("id");
 
 					fbi.once('value', function(snap){
 						var k = snap.val();
 						Object.keys(k).forEach(function(element, index, array){
-							if(k[element].filePayload == url_image){ 
+							//k[element].img_id is the photo id
+
+							if(k[element].img_id == id_image_saved){
 								// Add the photo to the folder /likes
-								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/likes/' + element);
-								fbil.update(k[element]);
-								console.log("Photo added");
-								// Remove the photo from the folder /images
-								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
-								fbii.remove();
+								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/likes');
+								fbil.once('value', function (snapl){
+									var kl = snapl.val();
+									console.log(kl);
+									if(kl){
+										var already = false;
+										Object.keys(kl).forEach(function (elementl){
+											if (kl[elementl].img_id == k[element].img_id){
+												already = true;
+											 }
+										});
+										if (!already){
+											fbil.push({'user_id':k[element].user_id, 'img_id':k[element].img_id, 'caption': k[element].caption });
+											console.log("Photo added");
+											// Remove the photo from the folder /images
+											fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
+									 		fbii.remove();
+										}
+									} else {
+										fbil.push({'user_id':k[element].user_id, 'img_id':k[element].img_id, 'caption': k[element].caption});
+										console.log("Photo added");
+										// Remove the photo from the folder /images
+										fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
+									 	fbii.remove();
+									}	
+								})	
 							}
-						});
-						
+						});						
 					});   
 				}
-      			  
     		});  
 
 		    // Swiper Left: delete the picture
@@ -305,19 +343,45 @@ var myFriendsFeedComponent = Vue.extend({
 		        $(this).append('<div class="status delete">Delete!</div>');
 
 		        if($(this).find("div").attr("class") == "status delete"){
-					var url_image = ($(this).find("img").attr("style").split("url(")[1]).split(");")[0];
+		        	var id_image_deleted = $(this).find("img").attr("id");
 
 					fbi.once('value', function(snap){
 						var k = snap.val();
 						Object.keys(k).forEach(function(element, index, array){
-							if(k[element].filePayload == url_image){ 
+							if(k[element].img_id == id_image_deleted){ 
 								// Add the photo to the folder /dislikes
-								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes/' + element);
-								fbil.update(k[element]);
-								console.log("Photo removed");
-								// Remove the photo from the folder /images
-								fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
-								fbii.remove();
+								fbil = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes');
+								fbil.once('value', function (snapl){
+									var kl = snapl.val();
+									console.log(kl);
+									if(kl){
+										var already = false;
+										Object.keys(kl).forEach(function (elementl){
+											console.log(elementl);
+											console.log(kl[elementl]);
+											console.log(k[element].img_id);
+											if (kl[elementl].img_id == k[element].img_id){
+												already = true;
+											 }
+										});
+										if(!already){
+											fb = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes/' + element);
+											fb.update({'user_id':k[element].user_id, 'img_id':k[element].img_id});
+											console.log("Photo removed");
+											// Remove the photo from the folder /images
+											fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
+											fbii.remove();
+										}
+									} 
+									if(!kl){
+										fb = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/dislikes/' + element);
+										fb.update({'user_id':k[element].user_id, 'img_id':k[element].img_id});
+										console.log("Photo removed");
+										// Remove the photo from the folder /images
+										fbii = new Firebase('https://intense-fire-5524.firebaseio.com/savedData/' + app.usr + '/images/' + element);
+										fbii.remove();
+									}
+								})
 							}
 						});
 						
@@ -327,7 +391,6 @@ var myFriendsFeedComponent = Vue.extend({
 		}
 	}
 });
-
 /******* LIKES SAVED PHOTOS COMPONENT *******/
 var savedPhotosComponent = Vue.extend({
 	props: ["savedfriendsphotos"],
@@ -357,7 +420,7 @@ var savedPhotosComponent = Vue.extend({
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
 				<ul id="savedList">
 					<li v-for="photo in savedfriendsphotos" class="photoFrame">
-						<img class="polaroid" id ="{{photo['img_id']}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo['user_id'],photo['img_id'])  + ')', display:block}">
+						<img class="polaroid" id ="{{photo.img_id}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')', display:block}">
 						{{photo.caption}}
 						</img>
 					</li>
@@ -654,47 +717,58 @@ function fetchSavedFriendFeed() {
 	 		if(k){
 	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
 	 			// 'element' is every id-user that app.usr may follow
-	 			//if(k[element].following == true){ // check if the following is effective
 	 				// Fetch the photos from the followed user
 	 				fbf.child(element).on('value', function (snapf) {
-	 					var kf = snapf.val();
-	 					var already = false;
+	 					var kf = snapf.val(); // list of pictures of 'element' user	 					
 
-	 					// Check if photos are not already in the likes or dislikes folder of this user
+	 					// Check if photos are not already in the images, likes or dislikes folder of this user
 	 					Object.getOwnPropertyNames(kf).forEach(function(elementf) {
 	 						// 'elementf' is the id of each photo
-	 						// LIKES folder
-	 						sd_likes.once('value', function (snapl){
-	 							var kl = snapl.val();
-	 							if(kl){
-	 								Object.keys(kl).forEach(function(elementl) {
-		 								if(elementl == elementf){
-		 									already = true; 
-		 								}
-		 							});
+	 						var already = false;
+
+	 						// IMAGES folder
+	 						sd_images.once('value', function (snapi){
+	 							var ki = snapi.val();
+	 							if(ki){
+	 								Object.keys(ki).forEach(function (elementi){
+	 									if(ki[elementi].img_id == elementf){
+	 										already = true;
+	 									}
+	 								});
 	 							}
-	 							
-	 						});
-	 						// DISLIKES folder
-	 						sd_dislikes.once('value', function(snapd) {
-	 							var kd = snapd.val();
-	 							if(kd){
-	 								Object.keys(kd).forEach(function(elementd) {
-		 								if(elementd == elementf){
-		 									already = true;
-		 								}
-		 							});
-	 							}
-	 						});	 							
+		 						// LIKES folder
+		 						sd_likes.once('value', function (snapl){
+		 							var kl = snapl.val();
+		 							if(kl){
+		 								Object.keys(kl).forEach(function(elementl) {
+			 								if(kl[elementl].img_id == elementf){	
+			 									already = true;
+			 								}
+			 							});
+		 							}
+			 						// DISLIKES folder
+			 						sd_dislikes.once('value', function(snapd) {
+			 							var kd = snapd.val();
+			 							if(kd){
+			 								Object.keys(kd).forEach(function(elementd) {
+				 								if(kd[elementd].img_id == elementf){
+				 									already = true;
+				 								}
+				 							});
+			 							}
+			 							if(!already){
+											sd_images.push({'user_id':element, 'img_id':elementf, 'caption': kf[elementf].caption});
+											console.log("Image added");
+										} 	
+			 						});			 							
+		 						});
+
+	 						});						
 	 					});
-	 					if(!already){
-							sd_images.update(kf);
-							console.log("Image added");
-						}
+	 					
 	 				});
-	 			//}
 	 		});
- }
+ 		}
 		});
  	app.$bindAsArray("savedfriendsphotos", sd_likes);
 }
