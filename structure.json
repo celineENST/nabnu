@@ -1,78 +1,71 @@
-"follow" : {
-	"uid0" :{
-		"uid0": {
-			"following": false,
-			"like":{
-					"idImg": "biksjks",
-					"idImg": "saugsuiagsia"
-					},
-			"dislike":{
-					"idImg": "bksdnsjsks",
-					"idImg": "hdbskskd"
-			},
-		"uid0": {
-			"following": true,
-			"like":{
-					"idImg": "biksjks",
-					"idImg": "saugsuiagsia"
-					},
-			"dislike":{
-					"idImg": "bksdnsjsks",
-					"idImg": "hdbskskd"
-			}
-		}
+"followers" : { // Stores the list of followers for each user
+	"uid0" : { // user uid0 is followed by uid1 and uid2
+		"uid1" : "email",
+		"uid2" : "email"
 	},
 	"uid1" : {
-		"uid1": {
-			"following": false,
-			"like":{
-					"idImg": "biksjks",
-					"idImg": "saugsuiagsia"
-					},
-			"dislike":{
-					"idImg": "bksdnsjsks",
-					"idImg": "hdbskskd"
-			},
-		"uid0": {
-			"following": true,
-			"liked":{
-					"idImg": "biksjks",
-					"idImg": "saugsuiagsia"
-					},
-			"dislike":{
-					"idImg": "bksdnsjsks",
-					"idImg": "hdbskskd"
-			}
-		}
-	}
-},
-
-"pola" : {
-	"uid" : {
-		"pushID1" : {
-			"timestamp" : "date1",
-			"filePayload" : "photo1",
-			"caption" : "blabla"
-		},
-		"pushID2": {
-			"timestamp" : "date2",
-			"filePayload" : "photo2",
-		}
+		"uid0" : "email"
 	},
-	"two" : {
-		"pushID1" : {
-			"timestamp" : "date1",
-			"filePayload" : "photo1",
-			"caption" : "blabla"
+	"uid2" : {
+		"uid1" : "email"
+	}
+},
+"list" : { // Stores the list of people each user follows
+	"uid0" : {
+		"uid1" : "email",
+	},
+	"uid1" : {
+		"uid0" : "email",
+		"uid2" : "email"
+	},
+	"uid2" : {
+		"uid0" : "email"
+	}
+},
+"pola" : {
+	"uid0" : {
+		"photoID0" : {
+			"caption" : "caption text",
+			"filePayload" : "image data in base 64",
+			"timestamp" : "DDMMYYYY"
 		},
-		"pushID2": {
-			"timestamp" : "date2",
-			"filePayload" : "photo2",
+		//...
+	},
+	"uid1" : {
+		//...
+	},
+	"uid2" : {
+		//...
+	}
+},
+"savedData" : {
+	"uid0" : {
+		"images" : { // Images that the user hasn't liked or discarded yet
+			"objectID" : {
+				"img_id" : "photoID of the image in pola folder",
+				"user_id" : "uid of the user that posted it"
+			},
+			//...
+		},
+		"likes" : {
+			"objectID" : {
+				"img_id" : "photoID of the image in pola folder",
+				"user_id" : "uid of the user that posted it"
+			},
+			//...
+		},
+		"dislikes" : {
+			"objectID" : {
+				"img_id" : "photoID of the image in pola folder",
+				"user_id" : "uid of the user that posted it"
+			},
+			//...
 		}
 	}
 },
-
-"users" : {
-	"uid0" : "mail@kth.se",
-	"uid1" : "email2@kth.se"
+users : {
+	"uid0" : {
+		"email" : "email"
+	},
+	//...
 }
