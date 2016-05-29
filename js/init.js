@@ -1,8 +1,5 @@
  var ref = new Firebase('https://intense-fire-5524.firebaseio.com');
 
- // Hide the loading message
-$.mobile.loading().hide();
-
 /******* AUTHENTICATION COMPONENT *******/
 var authComponent = Vue.extend({
 	template: `
@@ -255,13 +252,16 @@ var myFriendsFeedComponent = Vue.extend({
 	template: `		
 		<div class="row row-hv-centered" id="my-friends-feed">
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
-				<ul id="container">
+				<ul id="container" v-if="friendsphotos.length > 0">
 					<li v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
 						<img class="polaroid" id ="{{photo.img_id}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')', display:block}">
 						{{photo.caption}}
 						</img>
 					</li>
 				</ul>
+				<div v-else>
+					<h2>No new photo in feed!</h2>
+				</div>
 			</div>
 		</div>
 	`,
@@ -624,7 +624,18 @@ var loggedComponent = Vue.extend({
 	template: `
 		<div id="head" class="row">
 			<div class="col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3 col-lg-4 col-lg-offset-4" id="title-bar">
-				<h4>{{(currentView == 'my-friends-feed-component') ? "Home" : (currentView == 'search-component') ? "Users" : (currentView == 'upload-component') ? "New" : (currentView == 'saved-photos-component') ? "Likes" : "Uploads" }}</h4>
+				<h4>
+					{{
+						(currentView == 'my-friends-feed-component') ? 'Home' : 
+						(currentView == 'search-component') ? "Users" : 
+						(currentView == 'upload-component') ? "New" : 
+						(currentView == 'saved-photos-component') ? "Likes" : 
+						"Uploads" 
+					}}
+				</h4>
+				<h4 v-if="currentView=='my-friends-feed-component' && friendsphotos.length > 0" style="color: #888888;">
+					&nbsp;<span class="fa fa-question-circle" data-toggle="tooltip" title="Swipe right to save picture, left to discard" data-placement="bottom" id="toolt"></span>
+				</h4>
 			</div>
 		</div>
 		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos" :followinglist="followinglist" :followerslist="followerslist" :caption.sync="caption">
@@ -665,6 +676,14 @@ var app = new Vue({
 		usr: "",
 		spinner:""
 	}, 
+	ready: function() {
+		 // Hide the loading message
+		$.mobile.loading().hide();
+		// Binding the tooltip
+		$('body').tooltip({
+    		selector: '#toolt'
+		});
+	},
 	firebase : {
 	},
 	methods: {

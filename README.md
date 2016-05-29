@@ -2,6 +2,8 @@
 
 ## Capture the moment, one a day, everyday.
 
+[Demo] (https://people.kth.se/~celinec/nabnu/)
+
 Social Media Webapp where the user can only upload one picture a day, and share it with their followers. 
 In return they'll receive in his feed the daily pictures of the people they follow.
 
