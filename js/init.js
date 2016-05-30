@@ -477,11 +477,6 @@ var searchComponent = Vue.extend({
 				</ul>
 			</div>
 
-
-			
-		
-			
-			
 		</div>
 	`,
 	data: function(){
@@ -641,12 +636,24 @@ var loggedComponent = Vue.extend({
 		<component  :is="currentView" keep-alive :usr="usr" :url.sync="url" :photos="photos" :current-view.sync="currentView" :friendsphotos="friendsphotos" :savedfriendsphotos="savedfriendsphotos" :followinglist="followinglist" :followerslist="followerslist" :caption.sync="caption">
 		</component>
 		<div id="nav" class="row">
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')"><span class="fa fa-home fa-fw"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'search-component'}" @click="go('search-component')"><span class="fa fa-users fa-fw"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'upload-component'}" @click="go('upload-component')"><span class="fa fa-camera-retro fa-fw"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'saved-photos-component'}" @click="go('saved-photos-component')"><span class="fa fa-heart fa-fw"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'last-uploads-component'}" @click="go('last-uploads-component')"><span class="fa fa-paw fa-fw"></span></div>
-			<div class="link col-md-2 col-xs-2 col-lg-2" @click="logOut()"><span class="fa fa-sign-out fa-fw"></span></div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'my-friends-feed-component'}" @click="go('my-friends-feed-component')">
+				<span class="fa fa-home fa-fw"></span>
+			</div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'search-component'}" @click="go('search-component')">
+				<span class="fa fa-users fa-fw"></span>
+			</div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'upload-component'}" @click="go('upload-component')">
+				<span class="fa fa-camera-retro fa-fw"></span>
+			</div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'saved-photos-component'}" @click="go('saved-photos-component')">
+				<span class="fa fa-heart fa-fw"></span>
+			</div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" v-bind:class="{'active' : currentView == 'last-uploads-component'}" @click="go('last-uploads-component')">
+				<span class="fa fa-paw fa-fw"></span>
+			</div>
+			<div class="link col-md-2 col-xs-2 col-lg-2" @click="logOut()">
+				<span class="fa fa-sign-out fa-fw"></span>
+			</div>
 		</div>
 	`,
 	methods: {
@@ -732,62 +739,61 @@ function fetchSavedFriendFeed() {
 		// Look for who follows the app.usr
 		fbl.on('value', function (snap) {
 	 		var k=snap.val();
-	 		console.log(k);
-	 		if(k){
-	 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
-	 			// 'element' is every id-user that app.usr may follow
-	 				// Fetch the photos from the followed user
-	 				fbf.child(element).on('value', function (snapf) {
-	 					var kf = snapf.val(); // list of pictures of 'element' user	 					
+	 		if(k) { // If app.usr follows people
+		 		Object.getOwnPropertyNames(k).forEach(function(element,index,array){
+		 			// 'element' is every id-user that app.usr may follow
+		 				// Fetch the photos from the followed user
+		 				fbf.child(element).on('value', function (snapf) {
+		 					var kf = snapf.val(); // list of pictures of 'element' user	 					
+		 					if (kf) { // If the list isn't empty
+			 					// Check if photos are not already in the images, likes or dislikes folder of this user
+			 					Object.getOwnPropertyNames(kf).forEach(function(elementf) {
+			 						// 'elementf' is the id of each photo
+			 						var already = false;
 
-	 					// Check if photos are not already in the images, likes or dislikes folder of this user
-	 					Object.getOwnPropertyNames(kf).forEach(function(elementf) {
-	 						// 'elementf' is the id of each photo
-	 						var already = false;
-
-	 						// IMAGES folder
-	 						sd_images.once('value', function (snapi){
-	 							var ki = snapi.val();
-	 							if(ki){
-	 								Object.keys(ki).forEach(function (elementi){
-	 									if(ki[elementi].img_id == elementf){
-	 										already = true;
-	 									}
-	 								});
-	 							}
-		 						// LIKES folder
-		 						sd_likes.once('value', function (snapl){
-		 							var kl = snapl.val();
-		 							if(kl){
-		 								Object.keys(kl).forEach(function(elementl) {
-			 								if(kl[elementl].img_id == elementf){	
-			 									already = true;
-			 								}
-			 							});
-		 							}
-			 						// DISLIKES folder
-			 						sd_dislikes.once('value', function(snapd) {
-			 							var kd = snapd.val();
-			 							if(kd){
-			 								Object.keys(kd).forEach(function(elementd) {
-				 								if(kd[elementd].img_id == elementf){
-				 									already = true;
-				 								}
-				 							});
+			 						// IMAGES folder
+			 						sd_images.once('value', function (snapi){
+			 							var ki = snapi.val();
+			 							if(ki) {
+			 								Object.keys(ki).forEach(function (elementi){
+			 									if(ki[elementi].img_id == elementf){
+			 										already = true;
+			 									}
+			 								});
 			 							}
-			 							if(!already){
-											sd_images.push({'user_id':element, 'img_id':elementf, 'caption': kf[elementf].caption});
-											console.log("Image added");
-										} 	
-			 						});			 							
-		 						});
+				 						// LIKES folder
+				 						sd_likes.once('value', function (snapl){
+				 							var kl = snapl.val();
+				 							if(kl) {
+				 								Object.keys(kl).forEach(function(elementl) {
+					 								if(kl[elementl].img_id == elementf){	
+					 									already = true;
+					 								}
+					 							});
+				 							}
+					 						// DISLIKES folder
+					 						sd_dislikes.once('value', function(snapd) {
+					 							var kd = snapd.val();
+					 							if(kd) {
+					 								Object.keys(kd).forEach(function(elementd) {
+						 								if(kd[elementd].img_id == elementf){
+						 									already = true;
+						 								}
+						 							});
+					 							}
+					 							if(!already){
+													sd_images.push({'user_id':element, 'img_id':elementf, 'caption': kf[elementf].caption});
+													console.log("Image added");
+												} 	
+					 						});			 							
+				 						});
 
-	 						});						
-	 					});
-	 					
-	 				});
-	 		});
- 		}
+			 						});						
+			 					});
+		 					}
+		 				});
+		 		});
+		 	}
 		});
  	app.$bindAsArray("savedfriendsphotos", sd_likes);
 }
