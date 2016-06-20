@@ -108,7 +108,7 @@ var currentUploadComponent = Vue.extend({
 				<h3>You just uploaded a picture !</h3>
 				<div id="container">
 					<div class="photoFrame" style="display:block; margin: 0 !important;">
-						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + url + ')', display:block}">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + url + ')' }" style="display: block;">
 							{{ cap() }}
 						</img>
 					</div>
@@ -236,7 +236,7 @@ var lastUploadsComponent = Vue.extend({
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
 				<ul id="savedList">
 					<li v-for="photo in photos" class="photoFrame" style="display:inline-block;">
-						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')', display:block}">
+						<img class="polaroid" v-bind:style="{ backgroundImage: 'url(' + photo.filePayload + ')' }" style="display: block;">
 						{{photo.caption}}
 						</img>
 					</li>
@@ -254,7 +254,7 @@ var myFriendsFeedComponent = Vue.extend({
 			<div class="col-md-12 col-xs-12 col-lg-12 center-flex-column">
 				<ul id="container" v-if="friendsphotos.length > 0">
 					<li v-for="photo in friendsphotos" class="swipingPicture" style="display:block;" @mousedown="swipe()">
-						<img class="polaroid" id ="{{photo.img_id}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')', display:block}">
+						<img class="polaroid" v-bind:id ="photo.img_id" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')' }" style="display: block;">
 						{{photo.caption}}
 						</img>
 					</li>
@@ -420,7 +420,7 @@ var savedPhotosComponent = Vue.extend({
 			<div class="col-md-12 col-xs-12 col-lg-12 center-content no-margin-no-padding">
 				<ul id="savedList">
 					<li v-for="photo in savedfriendsphotos" class="photoFrame">
-						<img class="polaroid" id ="{{photo.img_id}}" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')', display:block}">
+						<img class="polaroid" v-bind:id ="photo.img_id" v-bind:style="{ backgroundImage: 'url(' + parse(photo.user_id,photo.img_id)  + ')'}" style="display: block;">
 						{{photo.caption}}
 						</img>
 					</li>
@@ -617,16 +617,11 @@ var loggedComponent = Vue.extend({
 		}
 	},
 	template: `
+	<div>
 		<div id="head" class="row">
 			<div class="col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3 col-lg-4 col-lg-offset-4" id="title-bar">
 				<h4>
-					{{
-						(currentView == 'my-friends-feed-component') ? 'Home' : 
-						(currentView == 'search-component') ? "Users" : 
-						(currentView == 'upload-component') ? "New" : 
-						(currentView == 'saved-photos-component') ? "Likes" : 
-						"Uploads" 
-					}}
+					{{ (currentView == 'my-friends-feed-component') ? 'Home' : (currentView == 'search-component') ? "Users" : (currentView == 'upload-component') ? "New" : (currentView == 'saved-photos-component') ? "Likes" : "Uploads" }}
 				</h4>
 				<h4 v-if="currentView=='my-friends-feed-component' && friendsphotos.length > 0" style="color: #888888;">
 					&nbsp;<span class="fa fa-question-circle" data-toggle="tooltip" title="Swipe right to save picture, left to discard" data-placement="bottom" id="toolt"></span>
@@ -655,6 +650,7 @@ var loggedComponent = Vue.extend({
 				<span class="fa fa-sign-out fa-fw"></span>
 			</div>
 		</div>
+	</div>
 	`,
 	methods: {
 		go: function(comp) {
@@ -801,6 +797,7 @@ function fetchSavedFriendFeed() {
 // Fetch the people that you follow
 function fetchFollowingList() {
 	app.$bindAsArray("followinglist",new Firebase( 'https://intense-fire-5524.firebaseio.com/list/' + app.usr).limitToLast(30));
+
 }
 
 // Fetch followers
